@@ -11,15 +11,15 @@ import (
 */
 
 type Superlotto638Result struct {
-	SerialID     string
-	Date         string // ex: 2006/02/02
-	Ball_1       string
-	Ball_2       string
-	Ball_3       string
-	Ball_4       string
-	Ball_5       string
-	Ball_6       string
-	Ball_special string // 第二區
+	SerialID           string
+	Date               string // ex: 2006/02/02
+	Num_1              string
+	Num_2              string
+	Num_3              string
+	Num_4              string
+	Num_5              string
+	Num_6              string
+	Num_second_section string // 第二區
 }
 
 type ISuperlotto638 interface {
@@ -53,15 +53,15 @@ func (lo *Superlotto638) SearchBySerialID(sid string) Superlotto638Result {
 	//
 
 	result := Superlotto638Result{
-		SerialID:     lo.get_text("#SuperLotto638Control_history1_dlQuery_DrawTerm_0"),
-		Date:         lo.get_text("#SuperLotto638Control_history1_dlQuery_Date_0"),
-		Ball_1:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No1_0"),
-		Ball_2:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No2_0"),
-		Ball_3:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No3_0"),
-		Ball_4:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No4_0"),
-		Ball_5:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No5_0"),
-		Ball_6:       lo.get_text("#SuperLotto638Control_history1_dlQuery_No6_0"),
-		Ball_special: lo.get_text("#SuperLotto638Control_history1_dlQuery_No7_0"),
+		SerialID:           lo.get_text("#SuperLotto638Control_history1_dlQuery_DrawTerm_0"),
+		Date:               lo.get_text("#SuperLotto638Control_history1_dlQuery_Date_0"),
+		Num_1:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No1_0"),
+		Num_2:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No2_0"),
+		Num_3:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No3_0"),
+		Num_4:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No4_0"),
+		Num_5:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No5_0"),
+		Num_6:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No6_0"),
+		Num_second_section: lo.get_text("#SuperLotto638Control_history1_dlQuery_No7_0"),
 	}
 	return result
 }
