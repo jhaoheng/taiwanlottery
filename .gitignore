@@ -3,3 +3,5 @@ chrome/chromedriver-darwin
 chrome/chromedriver-linux64
 chrome/*.test
 docs
+sql.db
+!model/testdb/sql.db

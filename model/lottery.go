@@ -8,23 +8,26 @@ import (
 )
 
 type ILottery interface {
-	SetCategory(category string) *Lottery
+	SetID(id int64) *Lottery
+	SetCategory(category LotteryCategory) *Lottery
 	SetSerialID(SerialID string) *Lottery
 	SetBallNumbers(ball_unmbers json.RawMessage) *Lottery
+	// ex: 2006/01/02
 	SetDate(date string) *Lottery
 	//
 	Take() (Lottery, error)
 	FindAll() ([]Lottery, error)
 	Create() (Lottery, error)
+	Delete() error
 }
 
 type Lottery struct {
 	db          *gorm.DB `gorm:"-"`
 	ID          int64
-	Category    string
+	Category    LotteryCategory
 	SerialID    string          // 期別, ex: 103000001
 	BallNumbers json.RawMessage // ex: 1,2,3,4,5,6
-	Date        time.Time       // 開獎日期, ex: 2006/01/01 15:04:05
+	Date        string          // 開獎日期, ex: 2006/01/01 15:04:05
 	UpdatedAt   time.Time
 	CreatedAt   time.Time
 }
@@ -36,10 +39,15 @@ func NewLottery() ILottery {
 }
 
 func (Lottery) TableName() string {
-	return "Lottery"
+	return "lottery"
 }
 
-func (model *Lottery) SetCategory(category string) *Lottery {
+func (model *Lottery) SetID(id int64) *Lottery {
+	model.ID = id
+	return model
+}
+
+func (model *Lottery) SetCategory(category LotteryCategory) *Lottery {
 	model.Category = category
 	return model
 }
@@ -56,11 +64,7 @@ func (model *Lottery) SetBallNumbers(ball_unmbers json.RawMessage) *Lottery {
 
 // date, 2006/01/02
 func (model *Lottery) SetDate(date string) *Lottery {
-	tmp, err := time.Parse("2006/01/02", date)
-	if err != nil {
-		panic(err)
-	}
-	model.Date = tmp
+	model.Date = date
 	return model
 }
 
@@ -79,4 +83,14 @@ func (model *Lottery) FindAll() ([]Lottery, error) {
 func (model *Lottery) Create() (Lottery, error) {
 	tx := model.db.Create(model)
 	return *model, tx.Error
+}
+
+func (model *Lottery) Update(vals Lottery) (Lottery, error) {
+	tx := model.db.Table("lottery").Updates(vals)
+	return *model, tx.Error
+}
+
+func (model *Lottery) Delete() error {
+	tx := model.db.Delete(model)
+	return tx.Error
 }

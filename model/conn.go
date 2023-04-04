@@ -12,7 +12,7 @@ import (
 
 var db *gorm.DB
 
-func Conn() (err error) {
+func ConnSQLite(path string) (err error) {
 
 	var loggerConfig logger.Config = logger.Config{
 		SlowThreshold:             time.Second * 2, // Slow SQL threshold
@@ -26,11 +26,20 @@ func Conn() (err error) {
 		loggerConfig,
 	)
 
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open(path), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {
 		panic("failed to connect database")
 	}
+
+	if err := MigrateSchema(); err != nil {
+		panic("failed to initial schema")
+	}
 	return nil
+}
+
+func MigrateSchema() error {
+	err := db.AutoMigrate(&Lottery{})
+	return err
 }
