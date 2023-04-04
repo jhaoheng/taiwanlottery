@@ -24,7 +24,7 @@ type Superlotto638Result struct {
 
 type ISuperlotto638 interface {
 	// 使用`期別`查詢, ex: 112000029
-	SearchBySerialID(sid string) Superlotto638Result
+	SearchBySerialID(sid string) (*Superlotto638Result, error)
 }
 
 type Superlotto638 struct {
@@ -39,20 +39,31 @@ func NewSuperlotto638(web_driver selenium.WebDriver) ISuperlotto638 {
 	}
 }
 
-func (lo *Superlotto638) SearchBySerialID(sid string) Superlotto638Result {
+func (lo *Superlotto638) SearchBySerialID(sid string) (result *Superlotto638Result, err error) {
+	defer func() {
+		if got_err := recover(); got_err != nil {
+			err = got_err.(error)
+		}
+	}()
 	//
-	lo.WebDriver.Get(lo.URL)
+	if err := lo.WebDriver.Get(lo.URL); err != nil {
+		panic(err)
+	}
 	time.Sleep(time.Second * 1)
 	//
 	input, err := lo.WebDriver.FindElement(selenium.ByCSSSelector, "#SuperLotto638Control_history1_txtNO")
 	if err != nil {
 		panic(err)
 	}
-	input.SendKeys(sid)
-	input.SendKeys(selenium.EnterKey)
+	if err := input.SendKeys(sid); err != nil {
+		panic(err)
+	}
+	if err := input.SendKeys(selenium.EnterKey); err != nil {
+		panic(err)
+	}
 	//
 
-	result := Superlotto638Result{
+	result = &Superlotto638Result{
 		SerialID:           lo.get_text("#SuperLotto638Control_history1_dlQuery_DrawTerm_0"),
 		Date:               lo.get_text("#SuperLotto638Control_history1_dlQuery_Date_0"),
 		Num_1:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No1_0"),
@@ -63,7 +74,7 @@ func (lo *Superlotto638) SearchBySerialID(sid string) Superlotto638Result {
 		Num_6:              lo.get_text("#SuperLotto638Control_history1_dlQuery_No6_0"),
 		Num_second_section: lo.get_text("#SuperLotto638Control_history1_dlQuery_No7_0"),
 	}
-	return result
+	return result, nil
 }
 
 // -
@@ -72,6 +83,9 @@ func (lo *Superlotto638) get_text(key string) string {
 	if err != nil {
 		panic(err)
 	}
-	text, _ := elem.Text()
+	text, err := elem.Text()
+	if err != nil {
+		panic(err)
+	}
 	return text
 }

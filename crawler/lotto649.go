@@ -24,7 +24,7 @@ type Lotto649Result struct {
 
 type ILotto649 interface {
 	// 使用`期別`查詢, ex: 112000029
-	SearchBySerialID(sid string) Lotto649Result
+	SearchBySerialID(sid string) (*Lotto649Result, error)
 }
 
 type Lotto649 struct {
@@ -40,20 +40,32 @@ func NewLotto649(web_driver selenium.WebDriver) ILotto649 {
 }
 
 // -
-func (lo *Lotto649) SearchBySerialID(sid string) Lotto649Result {
+func (lo *Lotto649) SearchBySerialID(sid string) (result *Lotto649Result, err error) {
+	defer func() {
+		if got_err := recover(); got_err != nil {
+			err = got_err.(error)
+		}
+	}()
+
 	//
-	lo.WebDriver.Get(lo.URL)
+	if err := lo.WebDriver.Get(lo.URL); err != nil {
+		panic(err)
+	}
 	time.Sleep(time.Second * 1)
 	//
 	input, err := lo.WebDriver.FindElement(selenium.ByCSSSelector, "#Lotto649Control_history_txtNO")
 	if err != nil {
 		panic(err)
 	}
-	input.SendKeys(sid)
-	input.SendKeys(selenium.EnterKey)
+	if err := input.SendKeys(sid); err != nil {
+		panic(err)
+	}
+	if err := input.SendKeys(selenium.EnterKey); err != nil {
+		panic(err)
+	}
 	//
 
-	result := Lotto649Result{
+	result = &Lotto649Result{
 		SerialID:    lo.get_text("#Lotto649Control_history_dlQuery_L649_DrawTerm_0"),
 		Date:        lo.get_text("#Lotto649Control_history_dlQuery_L649_DDate_0"),
 		Num_1:       lo.get_text("#Lotto649Control_history_dlQuery_No1_0"),
@@ -64,7 +76,7 @@ func (lo *Lotto649) SearchBySerialID(sid string) Lotto649Result {
 		Num_6:       lo.get_text("#Lotto649Control_history_dlQuery_No6_0"),
 		Num_special: lo.get_text("#Lotto649Control_history_dlQuery_SNo_0"),
 	}
-	return result
+	return result, nil
 }
 
 // -
@@ -73,6 +85,9 @@ func (lo *Lotto649) get_text(key string) string {
 	if err != nil {
 		panic(err)
 	}
-	text, _ := elem.Text()
+	text, err := elem.Text()
+	if err != nil {
+		panic(err)
+	}
 	return text
 }

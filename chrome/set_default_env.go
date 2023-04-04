@@ -13,9 +13,10 @@ type ENV struct {
 }
 
 var (
+	Default_Dir                    string = "../"
 	default_Chrome_AppPath         string = ""
-	default_Chrome_OsxDriverPath   string = "../chrome/chromedriver-darwin"
-	default_Chrome_LinuxDriverPath string = "../chrome/chromedriver-linux64"
+	default_Chrome_OsxDriverPath   string = "./chrome/chromedriver-darwin"
+	default_Chrome_LinuxDriverPath string = "./chrome/chromedriver-linux64"
 	default_UserAgent              string = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
 	default_AcceptLanguage         string = "en-US, en;q=0.9, zh-TW;q=0.8, zh;q=0.7"
 	default_AcceptEncoding         string = "gzip, deflate, br"
@@ -24,12 +25,10 @@ var (
 )
 
 func (c *ChromeObj) _Default_Env() {
-
-	binDir := "."
 	if runtime.GOOS == MAC_OSX {
-		c._ChromeDriverPath = binDir + "/" + default_Chrome_OsxDriverPath
+		c._ChromeDriverPath = Default_Dir + "/" + default_Chrome_OsxDriverPath
 	} else if runtime.GOOS == LINUX {
-		c._ChromeDriverPath = binDir + "/" + default_Chrome_LinuxDriverPath
+		c._ChromeDriverPath = Default_Dir + "/" + default_Chrome_LinuxDriverPath
 	} else {
 		panic("Can not find 'chrmoedriver' for this OS")
 	}
