@@ -45,6 +45,11 @@ func NewLottery() ILottery {
 	}
 }
 
+func NewLotteryWith(lottery Lottery) ILottery {
+	lottery.db = db
+	return &lottery
+}
+
 func (Lottery) TableName() string {
 	return "lottery"
 }

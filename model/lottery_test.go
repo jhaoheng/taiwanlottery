@@ -17,13 +17,13 @@ func Test_lottery_lotto649(t *testing.T) {
 	// create
 	fmt.Println("=== create ===")
 	nums := Lotto649Nums{
-		Num_1:       "10",
-		Num_2:       "22",
-		Num_3:       "26",
-		Num_4:       "29",
-		Num_5:       "45",
-		Num_6:       "47",
-		Num_special: "41",
+		Num_1:      "10",
+		Num_2:      "22",
+		Num_3:      "26",
+		Num_4:      "29",
+		Num_5:      "45",
+		Num_6:      "47",
+		NumSpecial: "41",
 	}
 	b, _ = json.Marshal(nums)
 	new_data, err := NewLottery().SetCategory(Lotto649).SetSerialID("112000038").SetBallNumbers(b).SetDate("112/03/31").Create()
