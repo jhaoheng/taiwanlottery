@@ -1,0 +1,5 @@
+chrome/*.app
+chrome/chromedriver-darwin
+chrome/chromedriver-linux64
+chrome/*.test
+docs
