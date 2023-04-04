@@ -10,7 +10,7 @@ import (
 
 func Test_lottery_lotto649(t *testing.T) {
 	path := "./testdb/sql.db"
-	ConnSQLite(path)
+	ConnSQLite(path, true)
 
 	var b []byte
 

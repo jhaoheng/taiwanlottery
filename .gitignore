@@ -5,3 +5,4 @@ chrome/*.test
 docs
 sql.db
 !model/testdb/sql.db
+todo.md

@@ -12,13 +12,17 @@ import (
 
 var db *gorm.DB
 
-func ConnSQLite(path string) (err error) {
+func ConnSQLite(path string, isDebug bool) (err error) {
 
 	var loggerConfig logger.Config = logger.Config{
 		SlowThreshold:             time.Second * 2, // Slow SQL threshold
 		LogLevel:                  logger.Error,    // Log level
 		IgnoreRecordNotFoundError: false,           // Ignore ErrRecordNotFound error for logger
-		Colorful:                  false,           // Disable color
+		Colorful:                  true,            // Disable color
+	}
+
+	if isDebug {
+		loggerConfig.LogLevel = logger.Info
 	}
 
 	newLogger := logger.New(
