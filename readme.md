@@ -11,3 +11,6 @@
 ## 爬蟲
 - 若想抓取最新資料, 使用爬蟲
 - 爬蟲 app 請參考, `./apps/crawler_lotto649`
+
+## sqlite database
+- 執行程式後, 根目錄會新增 `sql.db` 物件
