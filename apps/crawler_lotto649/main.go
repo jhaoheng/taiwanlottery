@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"jhaoheng/taiwanlottery/chrome"
-	"jhaoheng/taiwanlottery/crawler"
-	"jhaoheng/taiwanlottery/model"
 	"strconv"
+
+	"github.com/jhaoheng/taiwanlottery/chrome"
+	"github.com/jhaoheng/taiwanlottery/crawler"
+	"github.com/jhaoheng/taiwanlottery/model"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tebeka/selenium"

@@ -1,9 +1,10 @@
 package crawler
 
 import (
-	"jhaoheng/taiwanlottery/chrome"
 	"os"
 	"testing"
+
+	"github.com/jhaoheng/taiwanlottery/chrome"
 
 	"github.com/tebeka/selenium"
 )

@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"jhaoheng/taiwanlottery/fileop"
-	"jhaoheng/taiwanlottery/model"
 	"time"
+
+	"github.com/jhaoheng/taiwanlottery/fileop"
+	"github.com/jhaoheng/taiwanlottery/model"
 )
 
 func ImportLotto649() {
