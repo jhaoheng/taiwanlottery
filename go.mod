@@ -1,4 +1,4 @@
-module jhaoheng/taiwanlottery
+module github.com/jhaoheng/taiwanlottery
 
 go 1.19
 
