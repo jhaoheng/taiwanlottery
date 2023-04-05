@@ -13,6 +13,10 @@ func main() {
 	// ImportSuperLotto638()
 }
 
+/*
+- 判斷資料是否存在
+- 寫入新資料
+*/
 func WriteToDB(category model.LotteryCategory, lotterys []model.Lottery) {
 	model.ConnSQLite("../../sql.db")
 	db_write_success := 0
