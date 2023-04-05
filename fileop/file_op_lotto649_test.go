@@ -8,7 +8,7 @@ import (
 )
 
 func Test_fileop_ParsedLotto649CSV(t *testing.T) {
-	filepath := "../datas/2014/大樂透_2014.csv"
+	filepath := "../taiwan_lotto_csvs/2014/大樂透_2014.csv"
 	file_op, err := NewFileOP().Read(filepath)
 	if !assert.NoError(t, err) {
 		t.Fatal()

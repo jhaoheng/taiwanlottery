@@ -13,15 +13,15 @@ func ImportLotto649() {
 	fmt.Println("=== 大樂透 ===")
 
 	var filepaths = []string{
-		"../../datas/2014/大樂透_2014.csv",
-		"../../datas/2015/大樂透_2015.csv",
-		"../../datas/2016/大樂透_2016.csv",
-		"../../datas/2017/大樂透_2017.csv",
-		"../../datas/2018/大樂透_201801_201812.csv",
-		"../../datas/2019/大樂透_2019.csv",
-		"../../datas/2020/大樂透_202001_202012.csv",
-		"../../datas/2021/大樂透_2021.csv",
-		"../../datas/2022/大樂透_2022.csv",
+		"../../taiwan_lotto_csvs/2014/大樂透_2014.csv",
+		"../../taiwan_lotto_csvs/2015/大樂透_2015.csv",
+		"../../taiwan_lotto_csvs/2016/大樂透_2016.csv",
+		"../../taiwan_lotto_csvs/2017/大樂透_2017.csv",
+		"../../taiwan_lotto_csvs/2018/大樂透_201801_201812.csv",
+		"../../taiwan_lotto_csvs/2019/大樂透_2019.csv",
+		"../../taiwan_lotto_csvs/2020/大樂透_202001_202012.csv",
+		"../../taiwan_lotto_csvs/2021/大樂透_2021.csv",
+		"../../taiwan_lotto_csvs/2022/大樂透_2022.csv",
 	}
 
 	var csv_results []fileop.Lotto649CSV

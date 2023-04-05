@@ -12,15 +12,15 @@ func ImportSuperLotto638() {
 	fmt.Println("=== 威力彩 ===")
 
 	var filepaths = []string{
-		"../../datas/2014/威力彩_2014.csv",
-		"../../datas/2015/威力彩_2015.csv",
-		"../../datas/2016/威力彩_2016.csv",
-		"../../datas/2017/威力彩_2017.csv",
-		"../../datas/2018/威力彩_201801_201812.csv",
-		"../../datas/2019/威力彩_2019.csv",
-		"../../datas/2020/威力彩_202001_202012.csv",
-		"../../datas/2021/威力彩_2021.csv",
-		"../../datas/2022/威力彩_2022.csv",
+		"../../taiwan_lotto_csvs/2014/威力彩_2014.csv",
+		"../../taiwan_lotto_csvs/2015/威力彩_2015.csv",
+		"../../taiwan_lotto_csvs/2016/威力彩_2016.csv",
+		"../../taiwan_lotto_csvs/2017/威力彩_2017.csv",
+		"../../taiwan_lotto_csvs/2018/威力彩_201801_201812.csv",
+		"../../taiwan_lotto_csvs/2019/威力彩_2019.csv",
+		"../../taiwan_lotto_csvs/2020/威力彩_202001_202012.csv",
+		"../../taiwan_lotto_csvs/2021/威力彩_2021.csv",
+		"../../taiwan_lotto_csvs/2022/威力彩_2022.csv",
 	}
 
 	var csv_results []fileop.Superlotto638CSV
