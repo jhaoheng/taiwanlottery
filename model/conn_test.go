@@ -1,8 +1,15 @@
 package model
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
-func Test_Conn(t *testing.T) {
+func TestMain(m *testing.M) {
 	path := "./testdb/sql.db"
-	ConnSQLite(path, true)
+	IsDebug = true
+	ConnSQLite(path)
+
+	m.Run()
+	os.Exit(0)
 }

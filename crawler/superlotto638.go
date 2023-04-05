@@ -12,7 +12,7 @@ import (
 
 type Superlotto638Result struct {
 	SerialID           string
-	Date               string // ex: 2006/02/02
+	Date               string // 台灣彩券的資料會是民國(111/01/01)
 	Num_1              string
 	Num_2              string
 	Num_3              string

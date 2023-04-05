@@ -10,11 +10,11 @@ import (
 
 func main() {
 	ImportLotto649()
-	ImportSuperLotto638()
+	// ImportSuperLotto638()
 }
 
 func WriteToDB(category model.LotteryCategory, lotterys []model.Lottery) {
-	model.ConnSQLite("../../sql.db", false)
+	model.ConnSQLite("../../sql.db")
 	db_write_success := 0
 	for _, lottery := range lotterys {
 		obj, err := model.NewLottery().SetCategory(category).SetSerialID(lottery.SerialID).Take()

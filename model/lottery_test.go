@@ -9,9 +9,6 @@ import (
 )
 
 func Test_lottery_lotto649(t *testing.T) {
-	path := "./testdb/sql.db"
-	ConnSQLite(path, true)
-
 	var b []byte
 
 	// create
@@ -56,4 +53,29 @@ func Test_lottery_lotto649(t *testing.T) {
 	if err := NewLottery().SetID(result.ID).Delete(); !assert.NoError(t, err) {
 		t.Fatal()
 	}
+}
+
+func Test_lottery_lotto649_orderby(t *testing.T) {
+	//
+	datas := []Lottery{
+		0: {
+			Category: Lotto649,
+			SerialID: "112000001",
+		},
+		1: {
+			Category: Lotto649,
+			SerialID: "112000002",
+		},
+	}
+	NewLottery().CreateInBatch(datas)
+	//
+	result, err := NewLottery().SetCategory(Lotto649).OrderByDESC("id").Take()
+	if !assert.NoError(t, err) {
+		t.Fatal()
+	}
+	b, _ := json.MarshalIndent(result, "", "	")
+	fmt.Println(string(b))
+	//
+	NewLottery().SetID(1).Delete()
+	NewLottery().SetID(2).Delete()
 }

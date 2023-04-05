@@ -8,9 +8,12 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ILottery interface {
+	GormDB() *gorm.DB
+	//
 	SetID(id int64) *Lottery
 	SetCategory(category LotteryCategory) *Lottery
 	SetSerialID(SerialID string) *Lottery
@@ -23,6 +26,7 @@ type ILottery interface {
 	//
 	Take() (Lottery, error)
 	FindAll() ([]Lottery, error)
+	OrderByDESC(name string) *Lottery
 	Create() (Lottery, error)
 	CreateInBatch(datas []Lottery) error
 	Delete() error
@@ -52,6 +56,10 @@ func NewLotteryWith(lottery Lottery) ILottery {
 
 func (Lottery) TableName() string {
 	return "lottery"
+}
+
+func (model *Lottery) GormDB() *gorm.DB {
+	return model.db
 }
 
 func (model *Lottery) SetID(id int64) *Lottery {
@@ -130,4 +138,9 @@ func (model *Lottery) Update(vals Lottery) (Lottery, error) {
 func (model *Lottery) Delete() error {
 	tx := model.db.Delete(model)
 	return tx.Error
+}
+
+func (model *Lottery) OrderByDESC(name string) *Lottery {
+	model.db = model.db.Order(clause.OrderByColumn{Column: clause.Column{Name: name}, Desc: true})
+	return model
 }

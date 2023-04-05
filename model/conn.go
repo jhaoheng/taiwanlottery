@@ -12,7 +12,9 @@ import (
 
 var db *gorm.DB
 
-func ConnSQLite(path string, isDebug bool) (err error) {
+var IsDebug bool = false
+
+func ConnSQLite(path string) (err error) {
 
 	var loggerConfig logger.Config = logger.Config{
 		SlowThreshold:             time.Second * 2, // Slow SQL threshold
@@ -21,7 +23,7 @@ func ConnSQLite(path string, isDebug bool) (err error) {
 		Colorful:                  true,            // Disable color
 	}
 
-	if isDebug {
+	if IsDebug {
 		loggerConfig.LogLevel = logger.Info
 	}
 
