@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"jhaoheng/taiwanlottery/model"
+
+	"github.com/jhaoheng/taiwanlottery/model"
 
 	"gorm.io/gorm"
 )
