@@ -12,11 +12,12 @@ import (
 type NumCounts []NumCount
 
 type NumCount struct {
-	Num   string
-	Count int
+	Num        string
+	Count      int
+	Percentage float64
 }
 
-func (op *Lotto649OP) GetNumCount(start, end time.Time) (result NumCounts, start_data, end_data Lotto649OPData) {
+func (op *Lotto649OP) GetNumCount(start, end time.Time) (total_count int, result NumCounts, start_data, end_data Lotto649OPData) {
 	map_num := map[string]int{
 		"01": 0, "02": 0, "03": 0, "04": 0, "05": 0, "06": 0, "07": 0, "08": 0, "09": 0, "10": 0,
 		"11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0,
@@ -33,7 +34,7 @@ func (op *Lotto649OP) GetNumCount(start, end time.Time) (result NumCounts, start
 	}
 
 	for _, data := range op.Datas {
-		if data.Date.Unix() > start.Unix() && data.Date.Unix() < end.Unix() {
+		if data.Date.Unix() >= start.Unix() && data.Date.Unix() <= end.Unix() {
 			map_num[data.Num_1]++
 			map_num[data.Num_2]++
 			map_num[data.Num_3]++
@@ -41,6 +42,9 @@ func (op *Lotto649OP) GetNumCount(start, end time.Time) (result NumCounts, start
 			map_num[data.Num_5]++
 			map_num[data.Num_6]++
 			map_num[data.NumSpecial]++
+
+			//
+			total_count = total_count + 7
 
 			//
 			if start_data.Date.Unix() > data.Date.Unix() {
@@ -60,12 +64,13 @@ func (op *Lotto649OP) GetNumCount(start, end time.Time) (result NumCounts, start
 	result = []NumCount{}
 	for _, key := range keys {
 		result = append(result, NumCount{
-			Num:   key,
-			Count: map_num[key],
+			Num:        key,
+			Count:      map_num[key],
+			Percentage: float64(map_num[key]) / float64(total_count),
 		})
 	}
 
-	return result, start_data, end_data
+	return total_count, result, start_data, end_data
 }
 
 func (data NumCounts) OrderNumCount() {
