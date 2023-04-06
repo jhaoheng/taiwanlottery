@@ -3,7 +3,6 @@ package lotto649op
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -40,7 +39,8 @@ func Test_AccumulatedDatas_ExportCSV_1(t *testing.T) {
 			panic(err)
 		}
 	}
-	if err := ioutil.WriteFile(filepath, []byte(csv), os.FileMode(0777)); err != nil {
+	//
+	if err := os.WriteFile(filepath, []byte(csv), os.FileMode(0777)); err != nil {
 		panic(err)
 	}
 }
