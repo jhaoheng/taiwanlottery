@@ -9,7 +9,7 @@ import (
 - hit_num_count, 設定至少要幾個號碼中
 */
 
-func (op *Lotto649OP) CheckHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData) {
+func (op *Lotto649OP) CheckCustomizedHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData) {
 	if len(nums) < 6 {
 		fmt.Println("選號數字過少, 最少要六個")
 		return
@@ -32,10 +32,10 @@ func (op *Lotto649OP) CheckHits(hit_num_count int, nums ...string) (hit_lottery 
 		if _, ok := choice[data.Num_3]; ok {
 			hits++
 		}
-		if _, ok := choice[data.Num_3]; ok {
+		if _, ok := choice[data.Num_4]; ok {
 			hits++
 		}
-		if _, ok := choice[data.Num_4]; ok {
+		if _, ok := choice[data.Num_5]; ok {
 			hits++
 		}
 		if _, ok := choice[data.Num_6]; ok {

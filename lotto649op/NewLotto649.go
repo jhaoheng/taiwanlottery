@@ -17,7 +17,9 @@ type ILotto649OP interface {
 	// 取得時間範圍內, 以一期為單位, 重複的數字, 會有幾期
 	GetRepeatNumRateInEachSID(repeat_num_count int, start, end time.Time)
 	// 設定最少要相同的次數, 比對自己設定的號碼, 在歷史中, 正確率多高
-	CheckHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData)
+	CheckCustomizedHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData)
+	// 檢查歷史上, 中講過的號碼, 再次中獎機率
+	CheckHitLotto(hit_num_count int) (results []CheckHitLottoResult)
 }
 
 type Lotto649OP struct {
