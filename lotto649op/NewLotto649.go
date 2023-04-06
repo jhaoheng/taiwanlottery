@@ -14,6 +14,8 @@ type ILotto649OP interface {
 	GetNextDataByTime(the_time time.Time) (the_data Lotto649OPData)
 	// 取得累進範圍資料, 並取得最後的接下來 N 筆資料(用來比對)
 	AccumulatedDatasByTime(start, end time.Time, future_count int) AccumulatedData
+	// 取得時間範圍內, 以一期為單位, 重複的數字, 會有幾期
+	GetRepeatNumRateInEachSID(repeat_num_count int, start, end time.Time)
 }
 
 type Lotto649OP struct {
