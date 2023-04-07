@@ -20,6 +20,8 @@ type ILotto649OP interface {
 	CheckCustomizedHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData)
 	// 檢查歷史上, 中講過的號碼, 再次中獎機率
 	CheckHitLotto(hit_num_count int) (results []CheckHitLottoResult)
+	// 數字在時間上的趨勢
+	ExportNumsTrending() (filename, csv string)
 }
 
 type Lotto649OP struct {

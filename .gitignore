@@ -6,4 +6,4 @@ docs
 sql.db
 !model/testdb/sql.db
 todo.md
-accumulated_output
+*_output

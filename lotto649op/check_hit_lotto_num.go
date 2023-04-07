@@ -12,6 +12,7 @@ type CheckHitLottoResult struct {
 
 func (op *Lotto649OP) CheckHitLotto(hit_num_count int) (results []CheckHitLottoResult) {
 
+	//
 	results = []CheckHitLottoResult{}
 
 	for _, xdata := range op.Datas {
