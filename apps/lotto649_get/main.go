@@ -31,12 +31,12 @@ func main() {
 }
 
 /*
-- 會花比較久的時間
+- 會花比較久的時間, 第一次執行約一小時
 - 只能排除掉約 一百萬筆
 */
 func Filter_1(sets lotto649op.PossibleSets) {
 	//
-	sets = sets[:len(sets)/10000]
+	sets = sets[:len(sets)/1000]
 	//
 	start := time.Now()
 	results := op.Excluded_1(sets)

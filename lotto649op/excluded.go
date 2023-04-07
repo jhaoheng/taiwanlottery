@@ -14,6 +14,7 @@ func (op *Lotto649OP) Excluded_1(sets PossibleSets) (result PossibleSets) {
 	var new_set PossibleSets = [][]int{}
 
 	// 創建一個 map，用來快速檢查 set 是否符合 op.Datas 的條件
+	fmt.Println("準備資料中...")
 	setMaps := make([]map[string]empty, len(sets))
 	for i, set := range sets {
 		setMaps[i] = make(map[string]empty)
@@ -22,7 +23,11 @@ func (op *Lotto649OP) Excluded_1(sets PossibleSets) (result PossibleSets) {
 		}
 	}
 
+	fmt.Println("開始...")
 	for i, set := range sets {
+		if i%1000 == 0 {
+			fmt.Printf("=== %v ===\n", i)
+		}
 		save_flag := true
 		for _, data := range op.Datas {
 			hit := 0
