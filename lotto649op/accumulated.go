@@ -91,23 +91,23 @@ func (accumulated_data *AccumulatedData) ExportCSV_1() (filename, data string) {
 	accumulated_data.NumCounts.OrderByNum()
 	for _, num_count := range accumulated_data.NumCounts {
 		//
-		csv = csv + num_count.Num + ","                           // 第一欄 = 數字
-		csv = csv + fmt.Sprintf("%v", num_count.Count) + ","      // 第二欄 = 數量
-		csv = csv + fmt.Sprintf("%v", num_count.Percentage) + "," // 第三欄 = 百分比
+		csv = csv + num_count.Num + ","                      // 第一欄 = 數字
+		csv = csv + fmt.Sprintf("%v", num_count.Count) + "," // 第二欄 = 數量
+		csv = csv + fmt.Sprintf("%v", num_count.Percentage)  // 第三欄 = 百分比
 
 		//
 		for i := 0; i < len(future_data_keys); i++ {
 			csv = csv + func() string {
 				key := future_data_keys[i]
-				content := ""
+				content := ","
 				if future_data_map[key][num_count.Num] {
-					content = "ok"
+					content = ",ok"
 				}
 				// fmt.Println(key, content)
 				if i == len(future_data_keys)-1 {
 					return content
 				}
-				return content + ","
+				return content
 			}()
 		}
 

@@ -1,8 +1,10 @@
 package lotto649op
 
 import (
+	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/jhaoheng/taiwanlottery/model"
 )
@@ -19,4 +21,15 @@ func TestMain(m *testing.M) {
 
 	m.Run()
 	os.Exit(0)
+}
+
+func Test_GetLotto649OPDatasWithFactor(t *testing.T) {
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	start, _ := time.ParseInLocation("2006-01-02", "2014-01-01", loc)
+	end, _ := time.ParseInLocation("2006-01-02", "2023-04-05", loc)
+
+	results := NewLotto649OP(raw_results).GetLotto649OPDatasWithFactor(start, end)
+	// b, _ := json.MarshalIndent(results, "", "	")
+	// fmt.Println("===>", string(b))
+	fmt.Println("總共 =>", len(results))
 }

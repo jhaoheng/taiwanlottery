@@ -21,8 +21,8 @@ func Test_AccumulatedDatas(t *testing.T) {
 func Test_AccumulatedDatas_ExportCSV_1(t *testing.T) {
 	loc, _ := time.LoadLocation("Asia/Taipei")
 	start, _ := time.ParseInLocation("2006-01-02", "2014-01-01", loc)
-	end, _ := time.ParseInLocation("2006-01-02", "2023-03-01", loc)
-	accumulated_datas := NewLotto649OP(raw_results).AccumulatedDatasByTime(start, end, 10)
+	end, _ := time.ParseInLocation("2006-01-02", "2023-04-07", loc)
+	accumulated_datas := NewLotto649OP(raw_results).AccumulatedDatasByTime(start, end, 0)
 
 	// b, _ := json.MarshalIndent(accumulated_datas, "", "	")
 	// fmt.Println(string(b))
