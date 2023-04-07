@@ -17,10 +17,10 @@ func Test_CheckCustomizedHits_1(t *testing.T) {
 	// // datas = append(datas, []string{"01", "03", "05", "08", "11", "13", "14", "20", "21", "30", "33", "36"})
 	// datas = append(datas, []string{"03", "13", "16", "19", "21", "23", "01"})
 	// datas = append(datas, []string{"09", "16", "22", "33", "41", "34"})
-	datas = append(datas, []string{"03", "04", "16", "29", "32", "39"})
+	datas = append(datas, []string{"01", "11", "18", "20", "21", "35"})
 
 	for _, data := range datas {
-		result := NewLotto649OP(raw_results).CheckCustomizedHits(6, data...)
+		result := NewLotto649OP(raw_results).CheckCustomizedHits(5, data...)
 
 		b, _ := json.MarshalIndent(result, "", "	")
 		fmt.Println(string(b))
@@ -33,20 +33,25 @@ func Test_CheckCustomizedHits_1(t *testing.T) {
 */
 func Test_CheckCustomizedHits_With_HitLotto(t *testing.T) {
 	loc, _ := time.LoadLocation("Asia/Taipei")
-	start, _ := time.ParseInLocation("2006-01-02", "2014-01-01", loc)
+	start, _ := time.ParseInLocation("2006-01-02", "2022-01-01", loc)
 	end, _ := time.ParseInLocation("2006-01-02", "2023-04-05", loc)
 	op := NewLotto649OP(raw_results)
-	hit_nums := op.GetLotto649OPDatasWithFactor(start, end)
+	hit_nums := op.GetLotto649OPDatasAndReplaceOne(start, end)
 	fmt.Println("驗證數量=>", len(hit_nums))
 
 	//
-	for _, hit_num := range hit_nums {
-		result := NewLotto649OP(raw_results).CheckCustomizedHits(6, hit_num...)
+	for index, hit_num := range hit_nums {
+		results := NewLotto649OP(raw_results).CheckCustomizedHits(6, hit_num...)
 
 		// b, _ := json.MarshalIndent(result, "", "	")
 		// fmt.Println(string(b))
-		if len(result) != 0 {
-			fmt.Printf("[%v]，總共中獎有 => %v 組\n", hit_num, len(result))
+		if len(results) != 0 {
+			fmt.Printf("=== %v:%v ===\n", index, hit_num)
+			for _, result := range results {
+				fmt.Printf("=> %v, %v\n", result.Date.Format("2006-01-02"), result.SerialID)
+			}
+			fmt.Printf("總共中獎有 => %v 組\n", len(results))
+			fmt.Println()
 		}
 	}
 }

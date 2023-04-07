@@ -28,7 +28,7 @@ func Test_GetLotto649OPDatasWithFactor(t *testing.T) {
 	start, _ := time.ParseInLocation("2006-01-02", "2014-01-01", loc)
 	end, _ := time.ParseInLocation("2006-01-02", "2023-04-05", loc)
 
-	results := NewLotto649OP(raw_results).GetLotto649OPDatasWithFactor(start, end)
+	results := NewLotto649OP(raw_results).GetLotto649OPDatasAndReplaceOne(start, end)
 	// b, _ := json.MarshalIndent(results, "", "	")
 	// fmt.Println("===>", string(b))
 	fmt.Println("總共 =>", len(results))

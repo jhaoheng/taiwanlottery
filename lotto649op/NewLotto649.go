@@ -12,8 +12,10 @@ import (
 type ILotto649OP interface {
 	// 取得所有中獎資料
 	GetLotto649OPDatas() []Lotto649OPData
-	//  取得中獎組, 並隨機移除一個號碼, 替換上非中獎號碼
-	GetLotto649OPDatasWithFactor(start, end time.Time) [][]string
+	// 取得中獎組, 隨機移除一個號碼, 替換上非中獎號碼
+	GetLotto649OPDatasAndReplaceOne(start, end time.Time) [][]string
+
+	/**/
 	// 取得區間內的數字次數
 	GetNumCount(start, end time.Time) (total_count int, result NumCounts, start_data, end_data Lotto649OPData)
 	// 取得最靠近此時間的下一次數據資料
@@ -30,6 +32,10 @@ type ILotto649OP interface {
 	ExportNumsTrending() (filename, csv string)
 	// 取得所有排列組合
 	GetAllSets() (results PossibleSets)
+
+	/*
+	 */
+	Excluded_1(sets PossibleSets) (result PossibleSets)
 }
 
 type Lotto649OP struct {
@@ -80,7 +86,7 @@ func (op *Lotto649OP) GetLotto649OPDatas() []Lotto649OPData {
 /*
 - 取得所有中獎號碼, 時間範圍, 客製化 1 個號碼(隨機移除掉 1 個號碼, 並寫入非中獎號碼)
 */
-func (op *Lotto649OP) GetLotto649OPDatasWithFactor(start, end time.Time) [][]string {
+func (op *Lotto649OP) GetLotto649OPDatasAndReplaceOne(start, end time.Time) [][]string {
 
 	var cus_num = ""
 	hit_nums := [][]string{}
