@@ -46,6 +46,6 @@ func ConnSQLite(path string) (err error) {
 }
 
 func MigrateSchema() error {
-	err := db.AutoMigrate(&Lottery{})
+	err := db.AutoMigrate(&Lottery{}, &Lotto649AllSets{})
 	return err
 }

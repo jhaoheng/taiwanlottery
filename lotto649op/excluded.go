@@ -25,7 +25,7 @@ func (op *Lotto649OP) Excluded_1(sets PossibleSets) (result PossibleSets) {
 
 	fmt.Println("開始...")
 	for i, set := range sets {
-		if i%1000 == 0 {
+		if i%10000 == 0 {
 			fmt.Printf("=== %v ===\n", i)
 		}
 		save_flag := true

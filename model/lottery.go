@@ -26,7 +26,7 @@ type ILottery interface {
 	//
 	Take() (Lottery, error)
 	FindAll() ([]Lottery, error)
-	OrderByDESC(name string) *Lottery
+	OrderByDESC(item_name string) *Lottery
 	Create() (Lottery, error)
 	CreateInBatch(datas []Lottery) error
 	Delete() error
@@ -140,7 +140,7 @@ func (model *Lottery) Delete() error {
 	return tx.Error
 }
 
-func (model *Lottery) OrderByDESC(name string) *Lottery {
-	model.db = model.db.Order(clause.OrderByColumn{Column: clause.Column{Name: name}, Desc: true})
+func (model *Lottery) OrderByDESC(item_name string) *Lottery {
+	model.db = model.db.Order(clause.OrderByColumn{Column: clause.Column{Name: item_name}, Desc: true})
 	return model
 }
