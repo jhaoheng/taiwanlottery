@@ -33,8 +33,8 @@ type ILotto649Filtered interface {
 
 type Lotto649Filtered struct {
 	db        *gorm.DB  `gorm:"-"`
-	ID        int64     `gorm:"primaryKey"`                             //
-	Nums      string    `gorm:"index:idx_lotto649filtered_nums,unique"` // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
+	ID        int64     `gorm:"primaryKey"` //
+	Nums      string    // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
 	UpdatedAt time.Time //
 	CreatedAt time.Time //
 }
@@ -81,8 +81,9 @@ func (model *Lotto649Filtered) FindAll() ([]Lotto649Filtered, error) {
 func (model *Lotto649Filtered) FindNumsLike(texts []string) ([]Lotto649Filtered, error) {
 	output := []Lotto649Filtered{}
 	tx := model.db.Where(model)
+
 	for _, text := range texts {
-		tx.Where("nums LIKE ?", text)
+		tx = tx.Or("nums LIKE ?", text)
 	}
 	tx = tx.Find(&output)
 	return output, tx.Error
@@ -105,7 +106,7 @@ func (model *Lotto649Filtered) Update(vals Lotto649Filtered) (Lotto649Filtered, 
 }
 
 func (model *Lotto649Filtered) Delete() error {
-	tx := model.db.Where(1).Delete(model)
+	tx := model.db.Where(model).Delete(&Lotto649Filtered{})
 	return tx.Error
 }
 

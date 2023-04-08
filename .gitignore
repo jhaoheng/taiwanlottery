@@ -8,3 +8,4 @@ sql.db
 todo.md
 *_output
 *.csv
+docker-entrypoint-initdb.d

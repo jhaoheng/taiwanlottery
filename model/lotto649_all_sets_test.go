@@ -44,12 +44,12 @@ func Test_Lotto649AllSets_serial(t *testing.T) {
 	fmt.Printf("===> del all success\n\n")
 }
 
-func Test_Lotto649AllSets_FindNumsLike(t *testing.T) {
-	results, err := NewLotto649AllSets().FindNumsLike([]string{"%%02%%03%%08%%12%%"})
-	if !assert.NoError(t, err) {
-		t.Fatal()
-	}
+// func Test_Lotto649AllSets_FindNumsLike(t *testing.T) {
+// 	results, err := NewLotto649AllSets().FindNumsLike([]string{"%%02%%03%%08%%12%%"})
+// 	if !assert.NoError(t, err) {
+// 		t.Fatal()
+// 	}
 
-	b, _ := json.MarshalIndent(results, "", "	")
-	fmt.Println(string(b))
-}
+// 	b, _ := json.MarshalIndent(results, "", "	")
+// 	fmt.Println(string(b))
+// }

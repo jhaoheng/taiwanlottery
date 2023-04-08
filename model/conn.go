@@ -1,11 +1,12 @@
 package model
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -14,8 +15,7 @@ var db *gorm.DB
 
 var IsDebug bool = false
 
-func ConnSQLite(path string) (err error) {
-
+func ConnMySQL() (err error) {
 	var loggerConfig logger.Config = logger.Config{
 		SlowThreshold:             time.Second * 2, // Slow SQL threshold
 		LogLevel:                  logger.Error,    // Log level
@@ -32,16 +32,24 @@ func ConnSQLite(path string) (err error) {
 		loggerConfig,
 	)
 
-	db, err = gorm.Open(sqlite.Open(path), &gorm.Config{
+	dsn := "test:test@tcp(127.0.0.1:3311)/taiwanlottery?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
+
 	if err != nil {
-		panic("failed to connect database")
+		err = fmt.Errorf("ERROR: fail connection database %s", err.Error())
+		return
 	}
 
-	if err := MigrateSchema(); err != nil {
-		panic("failed to initial schema")
-	}
+	dbConfig, _ := db.DB()
+	dbConfig.SetMaxIdleConns(10)
+	dbConfig.SetMaxOpenConns(100)
+	dbConfig.SetConnMaxLifetime(time.Hour)
+
+	// if err := MigrateSchema(); err != nil {
+	// 	panic("failed to initial schema")
+	// }
 	return nil
 }
 

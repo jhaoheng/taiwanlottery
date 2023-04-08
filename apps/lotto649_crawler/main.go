@@ -24,7 +24,7 @@ flow
 */
 
 func init() {
-	if err := model.ConnSQLite("../../sql.db"); err != nil {
+	if err := model.ConnMySQL(); err != nil {
 		logrus.Fatal(err)
 	}
 }

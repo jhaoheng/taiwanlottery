@@ -1,11 +1,23 @@
 package module
 
+import (
+	"fmt"
+	"time"
+)
+
 /*
-- 排除掉連續 N 個數字, ex: 若 N=4 則 (1,2,3,4,9,11) 會被過濾掉
+- 產生指定的連續數字組合
+
+ex:
+數字 [1,2,3,4,5,6,7] 的組合有以下可能
+[1 2 3 4 5 6]
+[1 2 3 4 5 7]
+[1 3 4 5 6 7]
+[2 3 4 5 6 7]
 */
 
 type IPlanB interface {
-	GetCombinations() (combinations [][]int)
+	GetCombinations(min_num, max_num, consecutive, size int) (combinations [][]int)
 }
 
 type PlanB struct {
@@ -15,11 +27,18 @@ func NewPlanB() IPlanB {
 	return &PlanB{}
 }
 
-func (plan *PlanB) GetCombinations() (combinations [][]int) {
+/*
+consecutive: 要求的連續數字數量
+size: 每個排列的大小
+*/
+func (plan *PlanB) GetCombinations(min_num, max_num, consecutive, size int) (combinations [][]int) {
+	fmt.Println("=== PlanB ===")
+	start := time.Now()
 	combinations = [][]int{}
-	numbers := []int{1, 2, 3, 4, 5, 6, 7} // 需要排列的數字
-	size := 6                             // 每個排列的大小
-	consecutive := 5                      // 要求的連續數字數量
+	numbers := []int{} // 需要排列的數字
+	for i := min_num; i <= max_num; i++ {
+		numbers = append(numbers, i)
+	}
 
 	//
 	tmp_combinations := plan.generateCombinations(numbers, size)
@@ -28,6 +47,7 @@ func (plan *PlanB) GetCombinations() (combinations [][]int) {
 			combinations = append(combinations, c)
 		}
 	}
+	fmt.Printf("執行時間: %v\n", -time.Until(start))
 	return
 }
 

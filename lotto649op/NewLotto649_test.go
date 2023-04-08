@@ -12,7 +12,7 @@ import (
 var raw_results []model.Lottery
 
 func TestMain(m *testing.M) {
-	err := model.ConnSQLite("../sql.db")
+	err := model.ConnMySQL()
 	if err != nil {
 		panic(err)
 	}

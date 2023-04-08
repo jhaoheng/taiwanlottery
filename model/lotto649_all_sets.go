@@ -19,7 +19,7 @@ type ILotto649AllSets interface {
 	//
 	Take() (Lotto649AllSets, error)
 	FindAll() ([]Lotto649AllSets, error)
-	FindNumsLike(texts []string) ([]Lotto649AllSets, error)
+	// FindNumsLike(texts []string) ([]Lotto649AllSets, error)
 	Create() (Lotto649AllSets, error)
 	CreateInBatch(datas []Lotto649AllSets, batch_size int) error
 	Update(vals Lotto649AllSets) (Lotto649AllSets, error)
@@ -30,8 +30,8 @@ type ILotto649AllSets interface {
 
 type Lotto649AllSets struct {
 	db        *gorm.DB  `gorm:"-"`
-	ID        int64     `gorm:"primaryKey"`                            //
-	Nums      string    `gorm:"index:idx_lotto649allsets_nums,unique"` // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
+	ID        int64     `gorm:"primaryKey"` //
+	Nums      string    // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
 	UpdatedAt time.Time //
 	CreatedAt time.Time //
 }
@@ -74,12 +74,15 @@ func (model *Lotto649AllSets) FindAll() ([]Lotto649AllSets, error) {
 	return output, tx.Error
 }
 
-// text, ex: %abc%
-func (model *Lotto649AllSets) FindNumsLike(text []string) ([]Lotto649AllSets, error) {
-	output := []Lotto649AllSets{}
-	tx := model.db.Where(model).Where("nums LIKE ?", text).Find(&output)
-	return output, tx.Error
-}
+// // text, ex: %abc%
+// func (model *Lotto649AllSets) FindNumsLike(texts []string) ([]Lotto649AllSets, error) {
+// 	output := []Lotto649AllSets{}
+// 	for _, text := range texts {
+
+// 	}
+// 	tx := model.db.Where(model).Where("nums LIKE ?", text).Find(&output)
+// 	return output, tx.Error
+// }
 
 func (model *Lotto649AllSets) Create() (Lotto649AllSets, error) {
 	tx := model.db.Create(model)

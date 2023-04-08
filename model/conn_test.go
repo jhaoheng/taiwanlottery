@@ -6,18 +6,16 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	path := "./testdb/sql.db"
 	IsDebug = true
-	ConnSQLite(path)
+	ConnMySQL()
 
 	m.Run()
 	os.Exit(0)
 }
 
 func Test_Conn(t *testing.T) {
-	path := "./testdb/sql.db"
 	IsDebug = true
-	if err := ConnSQLite(path); err != nil {
+	if err := ConnMySQL(); err != nil {
 		t.Fatal()
 	}
 }

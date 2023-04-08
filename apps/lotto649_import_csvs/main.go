@@ -19,7 +19,7 @@ func main() {
 - 寫入新資料
 */
 func WriteToDB(category model.LotteryCategory, lotterys []model.Lottery) {
-	model.ConnSQLite("../../sql.db")
+	model.ConnMySQL()
 	db_write_success := 0
 	for _, lottery := range lotterys {
 		obj, err := model.NewLottery().SetCategory(category).SetSerialID(lottery.SerialID).Take()

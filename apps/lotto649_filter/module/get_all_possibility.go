@@ -12,7 +12,7 @@ import (
 /*
 - 取得所有組數
 - 寫入資料庫
-- 總共需要時間: 2m6.642164592s
+- 處理時間: 12m53.183714852s
 */
 func GetAllPossiblility(op lotto649op.ILotto649OP) {
 	fmt.Println("=== 開始取得所有組數 ===")
@@ -48,7 +48,7 @@ func GetAllPossiblility(op lotto649op.ILotto649OP) {
 	if err := model.NewLotto649AllSets().DeleteAll(); err != nil {
 		panic(err)
 	}
-	if err := model.NewLotto649AllSets().CreateInBatch(writes, 100); err != nil {
+	if err := model.NewLotto649AllSets().CreateInBatch(writes, 1000); err != nil {
 		panic(err)
 	}
 	fmt.Printf("done!!, 處理時間: %v\n\n", -time.Until(start))
