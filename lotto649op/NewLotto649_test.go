@@ -35,8 +35,7 @@ func Test_GetLotto649OPDatasWithFactor(t *testing.T) {
 }
 
 /*
-- 檢查目前中獎的號碼, 屬於連續號碼的機率
-*/
+ */
 func Test_GetLotto649OPDatas_CheckContinuousNums(t *testing.T) {
 	// continuous_num := 3
 

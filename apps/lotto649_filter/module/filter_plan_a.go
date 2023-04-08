@@ -82,6 +82,7 @@ func (filter *FilterPlanA) StartFilter(all_hits []lotto649op.Lotto649OPData) {
 	fmt.Printf("總共刪除: %v, 執行時間: %v\n", del_count, -time.Until(start))
 }
 
+/**/
 func (filter *FilterPlanA) generateCombinations(combinations *[][]int, current []int, remaining []int, count int) {
 	if count == 0 {
 		*combinations = append(*combinations, current)
