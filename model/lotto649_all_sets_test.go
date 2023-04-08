@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_lotto649_all_sets(t *testing.T) {
+func Test_Lotto649AllSets_serial(t *testing.T) {
 	fmt.Printf("\n\n=== create item ===")
 	new_item, err := NewLotto649AllSets().SetNums([]int{1, 2, 3, 4, 6, 5}).Create()
 	if !assert.NoError(t, err) {
@@ -42,4 +42,14 @@ func Test_lotto649_all_sets(t *testing.T) {
 		t.Fatal()
 	}
 	fmt.Printf("===> del all success\n\n")
+}
+
+func Test_Lotto649AllSets_FindNumsLike(t *testing.T) {
+	results, err := NewLotto649AllSets().FindNumsLike([]string{"%%02%%03%%08%%12%%"})
+	if !assert.NoError(t, err) {
+		t.Fatal()
+	}
+
+	b, _ := json.MarshalIndent(results, "", "	")
+	fmt.Println(string(b))
 }

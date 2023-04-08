@@ -12,18 +12,23 @@ import (
 - 過濾後的可能數組
 */
 
+/*
+- 複製資料: INSERT INTO lotto649_filtered SELECT * FROM lotto649_all_sets;
+*/
+
 type ILotto649Filtered interface {
 	SetID(id int64) *Lotto649Filtered
 	SetNums(nums []int) *Lotto649Filtered
 	//
 	Take() (Lotto649Filtered, error)
 	FindAll() ([]Lotto649Filtered, error)
-	FindNumsLike(texts []string) ([]Lotto649AllSets, error)
+	FindNumsLike(texts []string) ([]Lotto649Filtered, error)
 	Create() (Lotto649Filtered, error)
 	CreateInBatch(datas []Lotto649Filtered, batch_size int) error
 	Update(vals Lotto649Filtered) (Lotto649Filtered, error)
 	Delete() error
 	DeleteAll() error
+	BatchDelete(objs []Lotto649Filtered) error
 }
 
 type Lotto649Filtered struct {
@@ -73,8 +78,8 @@ func (model *Lotto649Filtered) FindAll() ([]Lotto649Filtered, error) {
 }
 
 // text, ex: %abc%
-func (model *Lotto649Filtered) FindNumsLike(texts []string) ([]Lotto649AllSets, error) {
-	output := []Lotto649AllSets{}
+func (model *Lotto649Filtered) FindNumsLike(texts []string) ([]Lotto649Filtered, error) {
+	output := []Lotto649Filtered{}
 	tx := model.db.Where(model)
 	for _, text := range texts {
 		tx.Where("nums LIKE ?", text)
@@ -105,6 +110,11 @@ func (model *Lotto649Filtered) Delete() error {
 }
 
 func (model *Lotto649Filtered) DeleteAll() error {
-	tx := model.db.Where("1 = 1").Delete(&Lotto649Filtered{})
+	tx := model.db.Where("1=1").Delete(&Lotto649Filtered{})
+	return tx.Error
+}
+
+func (model *Lotto649Filtered) BatchDelete(objs []Lotto649Filtered) error {
+	tx := model.db.Delete(objs)
 	return tx.Error
 }

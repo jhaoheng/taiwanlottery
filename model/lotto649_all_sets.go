@@ -19,7 +19,7 @@ type ILotto649AllSets interface {
 	//
 	Take() (Lotto649AllSets, error)
 	FindAll() ([]Lotto649AllSets, error)
-	FindNumsLike(text string) ([]Lotto649AllSets, error)
+	FindNumsLike(texts []string) ([]Lotto649AllSets, error)
 	Create() (Lotto649AllSets, error)
 	CreateInBatch(datas []Lotto649AllSets, batch_size int) error
 	Update(vals Lotto649AllSets) (Lotto649AllSets, error)
@@ -75,7 +75,7 @@ func (model *Lotto649AllSets) FindAll() ([]Lotto649AllSets, error) {
 }
 
 // text, ex: %abc%
-func (model *Lotto649AllSets) FindNumsLike(text string) ([]Lotto649AllSets, error) {
+func (model *Lotto649AllSets) FindNumsLike(text []string) ([]Lotto649AllSets, error) {
 	output := []Lotto649AllSets{}
 	tx := model.db.Where(model).Where("nums LIKE ?", text).Find(&output)
 	return output, tx.Error
