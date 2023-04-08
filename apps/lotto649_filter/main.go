@@ -17,6 +17,7 @@ func main() {
 
 	raw_results, _ = model.NewLottery().FindAll()
 	op = lotto649op.NewLotto649OP(raw_results)
+	// module.GetAllPossiblility(op) // 取得所有組數
 
 	/*
 		[目前策略] 指定時間區間
@@ -27,8 +28,4 @@ func main() {
 		4. 取得 區間 後面的 N 次中獎號碼, 查看號碼在過濾後的資料中, 出現率 4 個以上機率多高
 	*/
 
-	//
-	// module.GetAllPossiblility(op)
-	//
-	// Filter_1(sets)
 }
