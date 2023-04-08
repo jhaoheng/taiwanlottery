@@ -2,6 +2,7 @@ package lotto649op
 
 import (
 	"fmt"
+	"time"
 )
 
 /*
@@ -10,6 +11,16 @@ import (
 */
 
 func (op *Lotto649OP) CheckCustomizedHits(hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData) {
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	start, _ := time.ParseInLocation("2006-01-02", "2010-01-01", loc)
+	end := time.Now().In(loc)
+	return op.CheckCustomizedHitsWithTime(start, end, hit_num_count, nums...)
+}
+
+/*
+- 帶入中獎的時間
+*/
+func (op *Lotto649OP) CheckCustomizedHitsWithTime(start, end time.Time, hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData) {
 	if len(nums) < 6 {
 		fmt.Println("選號數字過少, 最少要六個")
 		return
@@ -22,6 +33,9 @@ func (op *Lotto649OP) CheckCustomizedHits(hit_num_count int, nums ...string) (hi
 
 	hit_lottery = []Lotto649OPData{}
 	for _, data := range op.Datas {
+		if start.Unix() > data.Date.Unix() || end.Unix() < data.Date.Unix() {
+			continue
+		}
 		hits := 0
 		if _, ok := choice[data.Num_1]; ok {
 			hits++
