@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"sort"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -32,11 +31,9 @@ type ILotto649Filtered interface {
 }
 
 type Lotto649Filtered struct {
-	db        *gorm.DB  `gorm:"-"`
-	ID        int64     `gorm:"primaryKey"` //
-	Nums      string    // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
-	UpdatedAt time.Time //
-	CreatedAt time.Time //
+	db   *gorm.DB `gorm:"-"`
+	ID   int64    `gorm:"primaryKey"` //
+	Nums string   // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
 }
 
 func (Lotto649Filtered) TableName() string {

@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 */
 
 type IPlanA interface {
+	FillTo6(combinations [][]int) [][]int
 	GetCombinations(all_hits []lotto649op.Lotto649OPData) (combinations [][]int)
 }
 
@@ -24,6 +26,34 @@ func NewPlanA() IPlanA {
 	return &PlanA{}
 }
 
+// 補齊六組號碼
+func (plan *PlanA) FillTo6(combinations [][]int) [][]int {
+	//
+	add_num := func(nums []int) [][]int {
+		new_nums := [][]int{}
+		num_map := map[int]struct{}{}
+		for _, num := range nums {
+			num_map[num] = struct{}{}
+		}
+		//
+		for i := 1; i <= 49; i++ {
+			if _, ok := num_map[i]; !ok {
+				tmp := append(nums, i)
+				new_nums = append(new_nums, tmp)
+			}
+		}
+		return new_nums
+	}
+
+	//
+	result := [][]int{}
+	for _, nums := range combinations {
+		result = append(result, add_num(nums)...)
+	}
+	return result
+}
+
+// -
 func (plan *PlanA) GetCombinations(all_hits []lotto649op.Lotto649OPData) (combinations [][]int) {
 	fmt.Println("=== PlanA ===")
 	start := time.Now()
@@ -47,9 +77,10 @@ func (plan *PlanA) GetCombinations(all_hits []lotto649op.Lotto649OPData) (combin
 		numbers := []int{
 			n1, n2, n3, n4, n5, n6, n7,
 		}
+		sort.Ints(numbers)
 		combinations = append(combinations, plan.M_Get_N(numbers, 5)...)
 	}
-	fmt.Printf("執行時間: %v\n", -time.Until(start))
+	fmt.Printf("總共有: %v, 執行時間: %v\n", len(combinations), -time.Until(start))
 	return
 }
 

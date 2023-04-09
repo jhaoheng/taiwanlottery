@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"sort"
-	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -29,11 +28,9 @@ type ILotto649AllSets interface {
 }
 
 type Lotto649AllSets struct {
-	db        *gorm.DB  `gorm:"-"`
-	ID        int64     `gorm:"primaryKey"` //
-	Nums      string    // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
-	UpdatedAt time.Time //
-	CreatedAt time.Time //
+	db   *gorm.DB `gorm:"-"`
+	ID   int64    `gorm:"primaryKey"` //
+	Nums string   // sort ascending and only 6 nums, ex: 1,2,3,4,5,6
 }
 
 func (Lotto649AllSets) TableName() string {

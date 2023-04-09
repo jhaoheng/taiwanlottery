@@ -2,10 +2,10 @@ version: "3.5"
 services:
   mysql:
     container_name: taiwanlottery
-    image: mysql:5.7
+    image: mariadb
     ports:
       - "3311:3306"
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --slow-query-log=ON --log-output=TABLE --long-query-time=1 
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --slow-query-log=ON --log-output=TABLE --long-query-time=1 --net_read_timeout=1200 
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: taiwanlottery

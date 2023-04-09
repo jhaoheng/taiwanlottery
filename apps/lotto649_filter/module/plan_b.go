@@ -6,6 +6,11 @@ import (
 )
 
 /*
+經過 plan_c 的計算
+在 plan_b 的做法, 最好取連續 3 個數字, 的排列組合
+*/
+
+/*
 - 產生指定的連續數字組合
 
 ex:
@@ -17,6 +22,7 @@ ex:
 */
 
 type IPlanB interface {
+	// [產生指定連續數字的組合]
 	GetCombinations(min_num, max_num, consecutive, size int) (combinations [][]int)
 }
 
@@ -28,6 +34,7 @@ func NewPlanB() IPlanB {
 }
 
 /*
+[產生指定連續數字的組合]
 consecutive: 要求的連續數字數量
 size: 每個排列的大小
 */
@@ -47,7 +54,7 @@ func (plan *PlanB) GetCombinations(min_num, max_num, consecutive, size int) (com
 			combinations = append(combinations, c)
 		}
 	}
-	fmt.Printf("執行時間: %v\n", -time.Until(start))
+	fmt.Printf("總共有: %v, 執行時間: %v\n", len(combinations), -time.Until(start))
 	return
 }
 

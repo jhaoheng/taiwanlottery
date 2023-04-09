@@ -1,6 +1,7 @@
 package module
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/jhaoheng/taiwanlottery/model"
 )
 
-func Test_PlanA(t *testing.T) {
+func Test_PlanA_GetCombinations(t *testing.T) {
 	model.ConnMySQL()
 
 	var all_hits = []lotto649op.Lotto649OPData{
@@ -43,4 +44,15 @@ func Test_PlanA(t *testing.T) {
 		[2 4 5 6 7]
 		[3 4 5 6 7]
 	*/
+}
+
+func Test_PlanA_FillTo6(t *testing.T) {
+	combinations := [][]int{
+		0: {1, 2, 3, 4, 5},
+	}
+	results := NewPlanA().FillTo6(combinations)
+	for _, result := range results {
+		b, _ := json.MarshalIndent(result, "", "	")
+		fmt.Println(string(b))
+	}
 }

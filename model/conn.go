@@ -44,7 +44,7 @@ func ConnMySQL() (err error) {
 
 	dbConfig, _ := db.DB()
 	dbConfig.SetMaxIdleConns(10)
-	dbConfig.SetMaxOpenConns(100)
+	dbConfig.SetMaxOpenConns(10)
 	dbConfig.SetConnMaxLifetime(time.Hour)
 
 	// if err := MigrateSchema(); err != nil {
