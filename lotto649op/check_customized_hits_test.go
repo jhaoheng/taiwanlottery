@@ -17,7 +17,7 @@ func Test_CheckCustomizedHits_1(t *testing.T) {
 	// // datas = append(datas, []string{"01", "03", "05", "08", "11", "13", "14", "20", "21", "30", "33", "36"})
 	// datas = append(datas, []string{"03", "13", "16", "19", "21", "23", "01"})
 	// datas = append(datas, []string{"09", "16", "22", "33", "41", "34"})
-	datas = append(datas, []string{"01", "11", "18", "20", "21", "35"})
+	datas = append(datas, []string{"04", "11", "20", "25", "32", "39", "30"})
 
 	for _, data := range datas {
 		result := NewLotto649OP(raw_results).CheckCustomizedHits(5, data...)

@@ -14,8 +14,6 @@ type ILotto649OP interface {
 	GetLotto649OPDatas() []Lotto649OPData
 	// 取得中獎組, 隨機移除一個號碼, 替換上非中獎號碼
 	GetLotto649OPDatasAndReplaceOne(start, end time.Time) [][]string
-	// 取得所有排列組合
-	GetAllSets() (results PossibleSets)
 
 	/**/
 	// 取得區間內的數字次數
@@ -130,39 +128,4 @@ func (op *Lotto649OP) GetLotto649OPDatasAndReplaceOne(start, end time.Time) [][]
 		}
 	}
 	return hit_nums
-}
-
-/*
-- 取得所有可能的排列組合
-*/
-
-type PossibleSets [][]int
-
-func (op *Lotto649OP) GetAllSets() PossibleSets {
-	max_num := 49
-	num_count := 6
-	results := [][]int{}
-
-	generateSequence(map[int]bool{}, max_num, num_count, []int{}, &results)
-
-	return results
-}
-
-func generateSequence(excluded_nums map[int]bool, max_num int, num_count int, nums []int, results *[][]int) {
-	// 如果生成了指定數量的數字，則將其添加到結果中
-	if len(nums) == num_count {
-		*results = append(*results, append([]int{}, nums...))
-		return
-	}
-
-	// 生成下一個數字
-	for i := 1; i <= max_num; i++ {
-		if !excluded_nums[i] && (len(nums) == 0 || i > nums[len(nums)-1]) {
-			excluded_nums[i] = true
-			nums = append(nums, i)
-			generateSequence(excluded_nums, max_num, num_count, nums, results)
-			nums = nums[:len(nums)-1]
-			excluded_nums[i] = false
-		}
-	}
 }
