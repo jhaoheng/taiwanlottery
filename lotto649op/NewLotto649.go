@@ -19,7 +19,7 @@ type ILotto649OP interface {
 	// 取得區間內的數字次數
 	GetNumCount(start, end time.Time) (total_count int, result NumCounts, start_data, end_data Lotto649OPData)
 	// 取得最靠近此時間的下一次數據資料
-	GetNextDataByTime(the_time time.Time) (the_data Lotto649OPData)
+	GetNextDataByTime(the_time time.Time, next int) (results []Lotto649OPData)
 	// 取得累進範圍資料, 並取得最後的接下來 N 筆資料(用來比對)
 	AccumulatedDatasByTime(start, end time.Time, future_count int) AccumulatedData
 	// 取得時間範圍內, 以一期為單位, 重複的數字, 會有幾期
@@ -69,6 +69,9 @@ func NewLotto649OP(lotto649_raw_datas []model.Lottery) ILotto649OP {
 			NumSpecial: nums.NumSpecial,
 		})
 	}
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Date.Unix() < datas[j].Date.Unix()
+	})
 	return &Lotto649OP{
 		Datas: datas,
 	}

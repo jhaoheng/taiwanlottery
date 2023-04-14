@@ -1,10 +1,9 @@
-package module
+package plan
 
 import (
 	"encoding/json"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/jhaoheng/taiwanlottery/lotto649op"
 	"github.com/jhaoheng/taiwanlottery/model"
@@ -16,13 +15,9 @@ func Test_PlanE_Run(t *testing.T) {
 	raw_results, _ := model.NewLottery().FindAll()
 	op := lotto649op.NewLotto649OP(raw_results)
 
-	loc, _ := time.LoadLocation("Asia/Taipei")
-	start, _ := time.ParseInLocation("2006-01-02", "2023-04-07", loc)
-	end, _ := time.ParseInLocation("2006-01-02", "2023-04-07", loc)
-
 	//
 	plan_e := NewPlanE()
-	filter_combinations := plan_e.GetSpecificNums(op.GetLotto649OPDatas(), start, end)
+	filter_combinations := plan_e.GetSpecificNums(op.GetLotto649OPDatas(), 1)
 	fmt.Println("取得該過濾的數字 =>", filter_combinations)
 
 	//

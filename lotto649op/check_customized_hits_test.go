@@ -59,34 +59,51 @@ func Test_CheckCustomizedHits_With_HitLotto(t *testing.T) {
 /*
 - 測試指定的（前幾期, ex: 1 個月）中獎號碼，出現在下一期的機率
 */
-func Test_CheckCustomizedHitsWithTime_2(t *testing.T) {
+func Test_CheckCustomizedHitsWithTime(t *testing.T) {
 
 	loc, _ := time.LoadLocation("Asia/Taipei")
 	op := NewLotto649OP(raw_results)
 
+	//
+	next := 2
 	// 取得下一期的中獎號碼
-	fmt.Println("取得下一期的中獎號碼")
-	current_time, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
-	next_lotto649 := op.GetNextDataByTime(current_time)
-	b, _ := json.MarshalIndent(next_lotto649, "", "	")
-	fmt.Println(string(b))
+	fmt.Printf("取得下 %v 期的中獎號碼\n", next)
+	nums := func() []string {
+		tmp := map[string]struct{}{}
+		current_time, _ := time.ParseInLocation("2006-01-02", "2023-04-01", loc)
+		datas := op.GetNextDataByTime(current_time, 1)
+		fmt.Println(func() string {
+			b, _ := json.MarshalIndent(datas, "", "	")
+			return string(b)
+		}())
+		//
+		for _, data := range datas {
+			tmp[data.Num_1] = struct{}{}
+			tmp[data.Num_2] = struct{}{}
+			tmp[data.Num_3] = struct{}{}
+			tmp[data.Num_4] = struct{}{}
+			tmp[data.Num_5] = struct{}{}
+			tmp[data.Num_6] = struct{}{}
+			tmp[data.NumSpecial] = struct{}{}
+		}
+		//
+		results := []string{}
+		for num := range tmp {
+			results = append(results, num)
+		}
+		return results
+	}()
 
 	//
-	nums := []string{
-		next_lotto649.Num_1,
-		next_lotto649.Num_2,
-		next_lotto649.Num_3,
-		next_lotto649.Num_4,
-		next_lotto649.Num_5,
-		next_lotto649.Num_6,
-		next_lotto649.NumSpecial,
-	}
-	start, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
-	end, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
+	start, _ := time.ParseInLocation("2006-01-02", "2023-03-01", loc)
+	end, _ := time.ParseInLocation("2006-01-02", "2023-04-01", loc)
 	fmt.Printf("跟前期比較, %v - %v\n", start.Format("2006-01-02"), end.Format("2006-01-02"))
-	hits := op.CheckCustomizedHitsWithTime(start, end, 1, nums...)
+	hits := op.CheckCustomizedHitsWithTime(start, end, 4, nums...)
+	fmt.Println("對中幾組 :", len(hits))
 	for _, hit := range hits {
-		b, _ := json.MarshalIndent(hit, "", "	")
-		fmt.Println(string(b))
+		fmt.Println(func() string {
+			b, _ := json.MarshalIndent(hit, "", "	")
+			return string(b)
+		}())
 	}
 }

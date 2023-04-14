@@ -1,4 +1,4 @@
-package module
+package plan
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
 	"github.com/jhaoheng/taiwanlottery/lotto649op"
 )
 
@@ -16,7 +17,7 @@ import (
 總共=> 891610
 */
 
-type IPlanA interface {
+type IPlanA7Get5 interface {
 	// 取得 7 取 5 排列組合
 	GetCombinations(all_hits []lotto649op.Lotto649OPData) (combinations [][]int)
 	// 補齊 六個號碼
@@ -25,12 +26,12 @@ type IPlanA interface {
 	RunFilter(guess_sets map[string]struct{}, filter_combinations [][]int) map[string]struct{}
 }
 
-type PlanA struct {
+type PlanA7Get5 struct {
 	Start time.Time
 }
 
-func NewPlanA() IPlanA {
-	return &PlanA{
+func NewPlanA7Get5() IPlanA7Get5 {
+	return &PlanA7Get5{
 		Start: time.Now(),
 	}
 }
@@ -38,8 +39,8 @@ func NewPlanA() IPlanA {
 /*
 - 總共有: 21756, 執行時間: 19.678175ms
 */
-func (plan *PlanA) GetCombinations(all_hits []lotto649op.Lotto649OPData) (combinations [][]int) {
-	fmt.Println("=== PlanA.GetCombinations() ===")
+func (plan *PlanA7Get5) GetCombinations(all_hits []lotto649op.Lotto649OPData) (combinations [][]int) {
+	fmt.Println("=== PlanA7Get5.GetCombinations() ===")
 	combinations = [][]int{}
 	for _, hit := range all_hits {
 		/*
@@ -71,7 +72,7 @@ func (plan *PlanA) GetCombinations(all_hits []lotto649op.Lotto649OPData) (combin
 - M 個數字中, 取 N 個數字, 進行排列組合
 - ex: numbers=[]int{1,2,3,4,5,6,7}, count=5 => 7 取 5 進行排列組合
 */
-func (plan *PlanA) M_Get_N(numbers []int, count int) (combinations [][]int) {
+func (plan *PlanA7Get5) M_Get_N(numbers []int, count int) (combinations [][]int) {
 	combinations = [][]int{} // 最後組合
 	plan.generateCombinations(&combinations, []int{}, numbers, count)
 
@@ -84,7 +85,7 @@ func (plan *PlanA) M_Get_N(numbers []int, count int) (combinations [][]int) {
 }
 
 /**/
-func (plan *PlanA) generateCombinations(combinations *[][]int, current []int, remaining []int, count int) {
+func (plan *PlanA7Get5) generateCombinations(combinations *[][]int, current []int, remaining []int, count int) {
 	if count == 0 {
 		*combinations = append(*combinations, current)
 		return
@@ -99,10 +100,10 @@ func (plan *PlanA) generateCombinations(combinations *[][]int, current []int, re
 /*
 - 補齊六組號碼
 */
-func (plan *PlanA) FillTo6(combinations [][]int) (results [][]int, results_map map[string]struct{}) {
-	fmt.Println("=== PlanA.FillTo6() ===")
+func (plan *PlanA7Get5) FillTo6(combinations [][]int) (results [][]int, results_map map[string]struct{}) {
+	fmt.Println("=== PlanA7Get5.FillTo6() ===")
 	//
-	results, results_map = FillTo6(combinations)
+	results, results_map = module.FillTo6(combinations)
 	//
 	fmt.Printf("消耗時間: %v\n", -time.Until(plan.Start))
 	return results, results_map
@@ -111,7 +112,7 @@ func (plan *PlanA) FillTo6(combinations [][]int) (results [][]int, results_map m
 /*
 -
 */
-func (plan *PlanA) RunFilter(guess_sets map[string]struct{}, filter_combinations [][]int) map[string]struct{} {
+func (plan *PlanA7Get5) RunFilter(guess_sets map[string]struct{}, filter_combinations [][]int) map[string]struct{} {
 	for _, data := range filter_combinations {
 		num_1 := strconv.Itoa(data[0])
 		num_2 := strconv.Itoa(data[1])

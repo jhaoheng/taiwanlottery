@@ -1,4 +1,4 @@
-package module
+package plan
 
 import (
 	"fmt"
@@ -11,11 +11,11 @@ import (
 )
 
 /*
-- 取得指定區間的中獎不重複數字
+- 取得 hits 中，從後面算起 N 個期數資料，並取得不重複的數字
 - 消耗時間: 53.774µs
 */
 type IPlanE interface {
-	GetSpecificNums(all_hits []lotto649op.Lotto649OPData, start, end time.Time) []int
+	GetSpecificNums(all_hits []lotto649op.Lotto649OPData, lastest_N int) []int
 	RunFilter(guess_sets map[string]struct{}, filter_nums []int) map[string]struct{}
 }
 
@@ -32,14 +32,17 @@ func NewPlanE() IPlanE {
 /*
 - 取得指定區間的中獎不重複數字
 */
-func (plan *PlanE) GetSpecificNums(all_hits []lotto649op.Lotto649OPData, start, end time.Time) []int {
+func (plan *PlanE) GetSpecificNums(all_hits []lotto649op.Lotto649OPData, lastest_N int) []int {
 	fmt.Println("=== PlanE.GetSpecificNums() ===")
 	//
+	hits := []lotto649op.Lotto649OPData{}
+	for i := 1; i <= lastest_N; i++ {
+		hit := all_hits[len(all_hits)-i]
+		hits = append(hits, hit)
+	}
+
 	map_num := map[string]struct{}{}
-	for _, hit := range all_hits {
-		if hit.Date.Unix() < start.Unix() || hit.Date.Unix() > end.Unix() {
-			continue
-		}
+	for _, hit := range hits {
 		if _, ok := map_num[hit.Num_1]; !ok {
 			map_num[hit.Num_1] = struct{}{}
 		}

@@ -2,13 +2,23 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/flowactions"
 	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/plan"
 	"github.com/jhaoheng/taiwanlottery/lotto649op"
 	"github.com/jhaoheng/taiwanlottery/model"
+	"gorm.io/gorm"
 )
+
+/*
+	raw_results, _ = model.NewLottery().FindAll()
+	op = lotto649op.NewLotto649OP(raw_results)
+	module.GetAllPossiblility(op) // 取得所有組數, 並寫入資料庫
+*/
 
 var raw_results []model.Lottery
 
@@ -23,87 +33,59 @@ func main() {
 
 	raw_results, _ = model.NewLottery().FindAll()
 	op = lotto649op.NewLotto649OP(raw_results)
-	// module.GetAllPossiblility(op) // 取得所有組數, 並寫入資料庫
+
+	//
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	start, err := time.ParseInLocation("2006-01-02", "1973-01-01", loc)
+	if err != nil {
+		panic(err)
+	}
+	// end, err := time.ParseInLocation("2006-01-02", "2023-02-17", loc)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	_, all_sets_map := module.NewAllSets().Get()
+	final_result := [][]plan.PlanFCountRankOnlyHitIndex{}
+	start_id := 768
+	for i := start_id; i < len(raw_results); i++ {
+		data, err := model.NewLottery().SetID(int64(i)).Take()
+		if err != nil && err != gorm.ErrRecordNotFound {
+			panic(err)
+		}
+		end := data.Date
+		flow_a := flowactions.NewFlowA(op, start, end).SetAllSetsMap(all_sets_map)
+		results := flow_a.Run().GetRankAndExportOnlyHitIndexes()
+		final_result = append(final_result, results)
+	}
 
 	/*
-		[目前策略] 指定時間區間
-		1. 取得指定區間的中獎資料
-		2. 取得推估的數據(消耗時間: 21.100764774s)
-		3. 取得 plan_d 的組合 (消耗時間: 3.832917736s), 進行過濾
-		4. 取得 plan_a 的數字（消耗時間: 1.160604563s），進行過濾
-		5. 取得 plan_e 的數字（消耗時間: 53.774µs），進行過濾
-		6. 取得可能的數字
-
-
-		=== 開始 GetAllSets ===
-		消耗時間: 21.100764774s
-		=== 開始 PlanD.GetConsecutiveSets() ===
-		消耗時間: 22.598µs
-		=== PlanD.FillTo6() ===
-		消耗時間: 4.89455652s
-		=== PlanA.GetCombinations() ===
-		總共有: 21735, 執行時間: 7.085448ms
-		=== PlanA.FillTo6() ===
-		消耗時間: 976.342363ms
-		=== PlanE.GetSpecificNums() ===
-		消耗時間: 44.477µs
-		最後剩下 => 2899068
+		建立 csv
 	*/
+	fmt.Println("=== 開始建立 csv ===")
+	BreakLineTag := "\r\n"
 
-	// 1. 取得指定區間的中獎資料
-	loc, _ := time.LoadLocation("Asia/Taipei")
-	start, _ := time.ParseInLocation("2006-01-02", "1973-01-01", loc)
-	end, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
-	hits := []lotto649op.Lotto649OPData{}
-	for _, hit := range op.GetLotto649OPDatas() {
-		if hit.Date.Unix() < start.Unix() || hit.Date.Unix() > end.Unix() {
-			continue
-		}
-		hits = append(hits, hit)
+	csv := ""
+
+	for i := 1; i <= 49; i++ {
+		csv = csv + "," + fmt.Sprintf("%v", i)
 	}
-	fmt.Printf("全部 his 有: %v\n", len(hits))
+	csv = csv + BreakLineTag
 
-	// 2. 取得推估的數據(消耗時間: 21.100764774s)
-	_, all_sets_map := module.NewAllSets().Get()
-	fmt.Println("原始組合 =>", len(all_sets_map))
+	for i := 0; i < len(final_result); i++ {
+		csv = csv + final_result[i][0].HitSerialID
+		for j := 0; j < len(final_result[i]); j++ {
+			value := ""
+			if final_result[i][j].Hit {
+				value = "1"
+			}
+			csv = csv + "," + fmt.Sprintf("%v", value)
+		}
+		csv = csv + BreakLineTag
+	}
 
-	// 3. 取得 plan_d 的組合 (消耗時間: 3.832917736s), 進行過濾
-	all_sets_map = func() map[string]struct{} {
-		plan_d := module.NewPlanD()
-		filter_combinations := plan_d.GetConsecutiveSets(3)
-		filter_combinations, _ = plan_d.FillTo6(filter_combinations)
-		all_sets_map = plan_d.RunFilter(all_sets_map, filter_combinations)
-		fmt.Println("剩下 =>", len(all_sets_map))
-		return all_sets_map
-	}()
-
-	// 4. 取得 plan_a 的數字（消耗時間: 222.021544ms），進行過濾
-	all_sets_map = func() map[string]struct{} {
-		plan_a := module.NewPlanA()
-		filter_combinations := plan_a.GetCombinations(hits)
-		filter_combinations, _ = plan_a.FillTo6(filter_combinations)
-		all_sets_map = plan_a.RunFilter(all_sets_map, filter_combinations)
-		fmt.Println("剩下 =>", len(all_sets_map))
-		return all_sets_map
-	}()
-
-	/* 5. 取得 plan_e 的數字（消耗時間: 53.774µs），進行過濾
-	- 只取得最後一次中獎數字
-	*/
-	all_sets_map = func() map[string]struct{} {
-		loc, _ := time.LoadLocation("Asia/Taipei")
-		start, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
-		end, _ := time.ParseInLocation("2006-01-02", "2023-04-04", loc)
-		plan_e := module.NewPlanE()
-		filter_combinations := plan_e.GetSpecificNums(hits, start, end)
-		fmt.Println("準備過濾的數字: ", filter_combinations)
-		all_sets_map = plan_e.RunFilter(all_sets_map, filter_combinations)
-		fmt.Println("剩下 =>", len(all_sets_map))
-		return all_sets_map
-	}()
-
-	// 6. 取得可能的數字，寫入資料庫
-	WriteToDB(all_sets_map)
+	// fmt.Println(csv)
+	os.WriteFile("test.csv", []byte(csv), 0777)
 
 }
 

@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+/*
+- 取得所有可能的組合 6 個號碼
+*/
+
 type IAllSets interface {
 	Get() (all_sets [][]int, all_sets_map map[string]struct{})
 }

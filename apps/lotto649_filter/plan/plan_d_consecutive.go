@@ -1,9 +1,11 @@
-package module
+package plan
 
 import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
 )
 
 /*
@@ -54,7 +56,7 @@ func (plan *PlanD) GetConsecutiveSets(N int) [][]int {
 func (plan *PlanD) FillTo6(combinations [][]int) (results [][]int, results_map map[string]struct{}) {
 	fmt.Println("=== PlanD.FillTo6() ===")
 	//
-	results, results_map = FillTo6(combinations)
+	results, results_map = module.FillTo6(combinations)
 	//
 	fmt.Printf("消耗時間: %v\n", -time.Until(plan.Start))
 	return results, results_map

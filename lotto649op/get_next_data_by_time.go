@@ -1,18 +1,21 @@
 package lotto649op
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
-func (op *Lotto649OP) GetNextDataByTime(the_time time.Time) (the_data Lotto649OPData) {
-	var min int64 = 1000000000.0
-	the_data = Lotto649OPData{}
+func (op *Lotto649OP) GetNextDataByTime(the_time time.Time, next int) (results []Lotto649OPData) {
+	results = []Lotto649OPData{}
 
 	for _, data := range op.Datas {
 		if data.Date.Unix()-the_time.Unix() > 0 {
-			if (data.Date.Unix() - the_time.Unix()) < min {
-				min = data.Date.Unix() - the_time.Unix()
-				the_data = data
-			}
+			results = append(results, data)
 		}
 	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Date.Unix() < results[j].Date.Unix()
+	})
 	return
 }

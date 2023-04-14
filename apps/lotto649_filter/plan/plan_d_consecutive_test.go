@@ -1,8 +1,10 @@
-package module
+package plan
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
 )
 
 func Test_PlanD(t *testing.T) {
@@ -19,7 +21,7 @@ func Test_PlanD(t *testing.T) {
 	// 	fmt.Println(result)
 	// }
 
-	NewValidator().CheckRepeat(filter_combinations)
+	module.NewValidator().CheckRepeat(filter_combinations)
 
 	//
 	all_sets := map[string]struct{}{

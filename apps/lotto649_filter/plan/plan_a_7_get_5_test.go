@@ -1,4 +1,4 @@
-package module
+package plan
 
 import (
 	"encoding/json"
@@ -11,14 +11,14 @@ import (
 	"github.com/jhaoheng/taiwanlottery/model"
 )
 
-func Test_PlanA_GetCombinations(t *testing.T) {
+func Test_PlanA7Get5_GetCombinations(t *testing.T) {
 	model.ConnMySQL()
 
 	var all_hits = []lotto649op.Lotto649OPData{
 		0: {SerialID: "test001", Num_1: "1", Num_2: "2", Num_3: "3", Num_4: "4", Num_5: "5", Num_6: "6", NumSpecial: "7"},
 	}
 
-	results := NewPlanA().GetCombinations(all_hits)
+	results := NewPlanA7Get5().GetCombinations(all_hits)
 	for _, result := range results {
 		fmt.Println(result)
 	}
@@ -48,23 +48,23 @@ func Test_PlanA_GetCombinations(t *testing.T) {
 	*/
 }
 
-func Test_PlanA_1(t *testing.T) {
+func Test_PlanA7Get5_1(t *testing.T) {
 	combinations := [][]int{
 		0: {1, 2, 3, 4, 5},
 	}
-	results, _ := NewPlanA().FillTo6(combinations)
+	results, _ := NewPlanA7Get5().FillTo6(combinations)
 	for _, result := range results {
 		b, _ := json.MarshalIndent(result, "", "	")
 		fmt.Println(string(b))
 	}
 }
 
-func Test_PlanA_Run(t *testing.T) {
+func Test_PlanA7Get5_Run(t *testing.T) {
 	model.ConnMySQL()
 	raw_results, _ := model.NewLottery().FindAll()
 	op := lotto649op.NewLotto649OP(raw_results)
 	//
-	plan_a := NewPlanA()
+	plan_a := NewPlanA7Get5()
 	filter_combinations := plan_a.GetCombinations(op.GetLotto649OPDatas())
 	filter_combinations, _ = plan_a.FillTo6(filter_combinations)
 	fmt.Println("總共=>", len(filter_combinations))
@@ -79,7 +79,7 @@ func Test_PlanA_Run(t *testing.T) {
 	fmt.Println(all_sets)
 }
 
-func Test_PlanA_real(t *testing.T) {
+func Test_PlanA7Get5_real(t *testing.T) {
 	model.ConnMySQL()
 	raw_results, _ := model.NewLottery().FindAll()
 	op := lotto649op.NewLotto649OP(raw_results)
@@ -100,7 +100,7 @@ func Test_PlanA_real(t *testing.T) {
 
 	//
 
-	plan_a := NewPlanA()
+	plan_a := NewPlanA7Get5()
 	filter_combinations := plan_a.GetCombinations(hits)
 	filter_combinations, _ = plan_a.FillTo6(filter_combinations)
 	fmt.Println("總共=>", len(filter_combinations))

@@ -26,14 +26,14 @@ func (op *Lotto649OP) AccumulatedDatasByTime(start, end time.Time, future_count 
 	future_datas := []Lotto649OPData{}
 	end_date := end_data.Date
 	for i := 0; i < future_count; i++ {
-		data := op.GetNextDataByTime(end_date)
-		if len(data.NumSpecial) == 0 {
+		datas := op.GetNextDataByTime(end_date, 1)
+		if len(datas[0].NumSpecial) == 0 {
 			break
 		}
-		future_datas = append(future_datas, data)
+		future_datas = append(future_datas, datas[0])
 		// b, _ := json.MarshalIndent(data, "", "	")
 		// fmt.Println(string(b))
-		end_date = data.Date
+		end_date = datas[0].Date
 	}
 
 	return AccumulatedData{
