@@ -79,3 +79,9 @@ func Test_lottery_lotto649_orderby(t *testing.T) {
 	NewLottery().SetID(1).Delete()
 	NewLottery().SetID(2).Delete()
 }
+
+func Test_lottery_lotto649_FindBetweenSID(t *testing.T) {
+	results, _ := NewLottery().FindBetweenSID("112000041", "112000042")
+	b, _ := json.MarshalIndent(results, "", "	")
+	fmt.Println(string(b))
+}

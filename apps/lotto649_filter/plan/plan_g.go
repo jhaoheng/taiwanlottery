@@ -9,7 +9,7 @@ import (
 )
 
 /*
-- 計算 num_index_hit 的報表
+- 計算 table num_index_hit 的報表
 */
 
 type IPlanG interface {
@@ -27,9 +27,12 @@ func NewPlanG() IPlanG {
 	return &PlanG{}
 }
 
+// 取得指定 sid 的 hum_index_sum 資料
 func (plan *PlanG) Get(sid string) (sums []model.NumIndexHitSum) {
 	sid_int, _ := strconv.Atoi(sid)
-
+	if _, err := model.NewNumIndexHit().SetSID(sid_int).Take(); err != nil {
+		panic(err)
+	}
 	sums = []model.NumIndexHitSum{}
 	for i := 1; i <= 49; i++ {
 		sum, _ := model.NewNumIndexHit().Sum(sid_int, i)

@@ -26,6 +26,7 @@ type ILottery interface {
 	//
 	Take() (Lottery, error)
 	FindAll() ([]Lottery, error)
+	FindBetweenSID(first_sid, last_sid string) ([]Lottery, error)
 	OrderByDESC(item_name string) *Lottery
 	Create() (Lottery, error)
 	CreateInBatch(datas []Lottery) error
@@ -117,6 +118,12 @@ func (model *Lottery) Take() (Lottery, error) {
 func (model *Lottery) FindAll() ([]Lottery, error) {
 	output := []Lottery{}
 	tx := model.db.Where(model).Find(&output)
+	return output, tx.Error
+}
+
+func (model *Lottery) FindBetweenSID(first_sid, last_sid string) ([]Lottery, error) {
+	output := []Lottery{}
+	tx := model.db.Where(model).Where("serial_id BETWEEN ? AND ?", first_sid, last_sid).Find(&output)
 	return output, tx.Error
 }
 

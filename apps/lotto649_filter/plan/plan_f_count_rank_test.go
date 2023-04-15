@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/jhaoheng/taiwanlottery/lotto649op"
 )
 
 func Test_RankCount_GetRank(t *testing.T) {
@@ -30,7 +28,7 @@ func Test_RankCount_ExportCSV(t *testing.T) {
 	//
 	plan_f := NewPlanFCountRank(hit_map)
 	ranks := plan_f.GetRank()
-	csv := plan_f.ExportCSV(ranks, lotto649op.Lotto649OPData{})
+	csv := plan_f.ExportCSV(ranks, nil, nil)
 	//
 	filename := "./plan_f_export.csv"
 	os.WriteFile(filename, []byte(csv), 0777)

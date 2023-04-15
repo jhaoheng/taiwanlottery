@@ -2,16 +2,17 @@ package model
 
 import (
 	"fmt"
-	"strconv"
 
 	"gorm.io/gorm"
 )
 
 type INumIndexHit interface {
-	SetSID(sid string) *NumIndexHit
+	SetSID(sid int) *NumIndexHit
 	SetNumIndexes(datas []NumIndex) *NumIndexHit
+	Take() (NumIndexHit, error)
 	FinaAll() ([]NumIndexHit, error)
 	Create() (NumIndexHit, error)
+	// 取得 <=sid 的指定數字總和
 	Sum(sid, index int) (NumIndexHitSum, error)
 }
 
@@ -80,12 +81,8 @@ func NewNumIndexHit() INumIndexHit {
 	}
 }
 
-func (model *NumIndexHit) SetSID(sid string) *NumIndexHit {
-	i, err := strconv.Atoi(sid)
-	if err != nil {
-		panic(err)
-	}
-	model.SID = i
+func (model *NumIndexHit) SetSID(sid int) *NumIndexHit {
+	model.SID = sid
 	return model
 }
 
@@ -207,6 +204,12 @@ func (model *NumIndexHit) SetNumIndexes(datas []NumIndex) *NumIndexHit {
 	return model
 }
 
+func (model *NumIndexHit) Take() (NumIndexHit, error) {
+	output := NumIndexHit{}
+	tx := model.db.Where(model).Take(&output)
+	return output, tx.Error
+}
+
 func (model *NumIndexHit) FinaAll() ([]NumIndexHit, error) {
 	output := []NumIndexHit{}
 	tx := model.db.Where(model).Find(&output)
@@ -223,6 +226,7 @@ type NumIndexHitSum struct {
 	Total int
 }
 
+// 取得 <=sid 的指定數字總和
 func (model *NumIndexHit) Sum(sid, index int) (NumIndexHitSum, error) {
 	result := NumIndexHitSum{
 		Index: index,

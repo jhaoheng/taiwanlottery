@@ -1,4 +1,4 @@
-package flowactions
+package flow
 
 import (
 	"fmt"
@@ -40,7 +40,7 @@ type IFlowA interface {
 	SetAllSetsMap(all_sets_map map[string]struct{}) *FlowA
 	Run() *FlowA
 	GetRankAndCSV() (csv string)
-	GetRankAndExportOnlyHitIndexes() []plan.PlanFCountRankOnlyHitIndex
+	GetRankAndExportOnlyHitIndexes() (results []plan.PlanFCountRankOnlyHitIndex, csv string)
 }
 
 type FlowA struct {
@@ -104,7 +104,13 @@ func (flow *FlowA) SetAllSetsMap(all_sets_map map[string]struct{}) *FlowA {
 	return flow
 }
 
-/**/
+/*
+- 欄位: index, num, count, next_sid_hit
+- index: num 的 count 排序
+- num: 數字 1-49
+- count: 每個 num 可能出現的機率
+- next_sid_hit: 下一期的中獎號碼
+*/
 func (flow *FlowA) Run() *FlowA {
 	all_sets_map := make(map[string]struct{})
 	if len(flow.OriAllSetsMap) == 0 {
@@ -142,16 +148,55 @@ func (flow *FlowA) Run() *FlowA {
 	return flow
 }
 
-/**/
-func (flow *FlowA) GetRankAndExportOnlyHitIndexes() []plan.PlanFCountRankOnlyHitIndex {
+/*
+- 產生以下一期（sid）中獎號碼 在 index(累積數據後建立的 index) 的關係
+*/
+func (flow *FlowA) GetRankAndExportOnlyHitIndexes() (results []plan.PlanFCountRankOnlyHitIndex, csv string) {
 	plan_f := plan.NewPlanFCountRank(flow.AllSetsMap)
 	ranks := plan_f.GetRank()
-	return plan_f.ExportOnlyHitIndexes(ranks, flow.NextLastestHit)
+	results = plan_f.ExportOnlyHitIndexes(ranks, &flow.NextLastestHit)
+
+	/*
+		建立這一次檔案的 csv
+	*/
+	csv = func() string {
+		fmt.Println("=== 開始建立 csv ===")
+		final_result := [][]plan.PlanFCountRankOnlyHitIndex{
+			0: results,
+		}
+		csv = ""
+		BreakLineTag := "\r\n"
+
+		for i := 1; i <= 49; i++ {
+			csv = csv + "," + fmt.Sprintf("%v", i)
+		}
+		csv = csv + BreakLineTag
+
+		for i := 0; i < len(final_result); i++ {
+			csv = csv + final_result[i][0].HitSerialID
+			for j := 0; j < len(final_result[i]); j++ {
+				value := ""
+				if final_result[i][j].Hit {
+					value = "1"
+				}
+				csv = csv + "," + fmt.Sprintf("%v", value)
+			}
+			csv = csv + BreakLineTag
+		}
+		return csv
+	}()
+	return
 }
 
-/**/
+/*
+- 欄位: index, num, count, next_sid_hit
+- index: num 的 count 排序
+- num: 數字 1-49
+- count: 每個 num 可能出現的機率
+- next_sid_hit: 下一期的中獎號碼
+*/
 func (flow *FlowA) GetRankAndCSV() (csv string) {
 	plan_f := plan.NewPlanFCountRank(flow.AllSetsMap)
 	ranks := plan_f.GetRank()
-	return plan_f.ExportCSV(ranks, flow.NextLastestHit)
+	return plan_f.ExportCSV(ranks, nil, &flow.NextLastestHit)
 }

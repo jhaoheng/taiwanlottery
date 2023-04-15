@@ -65,13 +65,13 @@ index的中獎次數加總（index）
 
 type IPlanFCountRank interface {
 	GetRank() []PlanFCountRankItem
-	ExportCSV(datas []PlanFCountRankItem, compare_hit lotto649op.Lotto649OPData) (csv string)
-	ExportOnlyHitIndexes(datas []PlanFCountRankItem, compare_hit lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex)
+	ExportCSV(datas []PlanFCountRankItem, hit, next_hit *lotto649op.Lotto649OPData) (csv string)
+	ExportOnlyHitIndexes(datas []PlanFCountRankItem, compare_hit *lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex)
 }
 
 type PlanFCountRank struct {
-	Start   time.Time
-	DataMap map[string]struct{}
+	Start   time.Time           //
+	DataMap map[string]struct{} // 可能中獎的排序, ex: 1,2,3,4,5,6
 }
 
 func NewPlanFCountRank(data_map map[string]struct{}) IPlanFCountRank {
@@ -152,25 +152,27 @@ func (plan *PlanFCountRank) GetRank() []PlanFCountRankItem {
 	return ranks
 }
 
-func (plan *PlanFCountRank) ExportCSV(datas []PlanFCountRankItem, compare_hit lotto649op.Lotto649OPData) (csv string) {
+/*
+- datas: 產生累積的 datas 與 下一期號碼的關係
+- hit: 指定期數的中獎號碼
+- next_hit: 下一期的中獎號碼
+*/
+func (plan *PlanFCountRank) ExportCSV(datas []PlanFCountRankItem, hit, next_hit *lotto649op.Lotto649OPData) (csv string) {
 	fmt.Printf("=== PlanE.ExportCSV ===\n")
-	fmt.Printf("下一期參數: %+v\n", compare_hit)
+	fmt.Printf("本期參數: %+v\n", hit)
+	fmt.Printf("下一期參數: %+v\n", next_hit)
 
-	BreakLineTag := "\r\n"
-	csv = ",num,count,hit" + BreakLineTag
-
-	hit_map := func() map[int]struct{} {
-		if compare_hit == (lotto649op.Lotto649OPData{}) {
+	get_map := func(the_data *lotto649op.Lotto649OPData) map[int]struct{} {
+		if the_data == nil {
 			return map[int]struct{}{0: {}}
 		}
-
-		n1, _ := strconv.Atoi(compare_hit.Num_1)
-		n2, _ := strconv.Atoi(compare_hit.Num_2)
-		n3, _ := strconv.Atoi(compare_hit.Num_3)
-		n4, _ := strconv.Atoi(compare_hit.Num_4)
-		n5, _ := strconv.Atoi(compare_hit.Num_5)
-		n6, _ := strconv.Atoi(compare_hit.Num_6)
-		n7, _ := strconv.Atoi(compare_hit.NumSpecial)
+		n1, _ := strconv.Atoi(the_data.Num_1)
+		n2, _ := strconv.Atoi(the_data.Num_2)
+		n3, _ := strconv.Atoi(the_data.Num_3)
+		n4, _ := strconv.Atoi(the_data.Num_4)
+		n5, _ := strconv.Atoi(the_data.Num_5)
+		n6, _ := strconv.Atoi(the_data.Num_6)
+		n7, _ := strconv.Atoi(the_data.NumSpecial)
 		return map[int]struct{}{
 			n1: {},
 			n2: {},
@@ -180,8 +182,18 @@ func (plan *PlanFCountRank) ExportCSV(datas []PlanFCountRankItem, compare_hit lo
 			n6: {},
 			n7: {},
 		}
-	}()
+	}
 
+	BreakLineTag := "\r\n"
+	csv = fmt.Sprintf(",num,count,hit(%v),next_hit(%v)", hit.SerialID, next_hit.SerialID) + BreakLineTag
+
+	// 取得 hit_map
+	hit_map := get_map(hit)
+
+	// 取得 next_hit_map
+	next_hit_map := get_map(next_hit)
+
+	//
 	for index, data := range datas {
 		num := data.Num
 		count := data.Count
@@ -191,8 +203,14 @@ func (plan *PlanFCountRank) ExportCSV(datas []PlanFCountRankItem, compare_hit lo
 			}
 			return 0
 		}()
+		is_next_hit := func() int {
+			if _, ok := next_hit_map[num]; ok {
+				return 1000000
+			}
+			return 0
+		}()
 
-		csv = csv + fmt.Sprintf("%d,%v,%v,%v", index+1, num, count, is_hit) + BreakLineTag
+		csv = csv + fmt.Sprintf("%d,%v,%v,%v,%v", index+1, num, count, is_hit, is_next_hit) + BreakLineTag
 	}
 
 	return
@@ -214,14 +232,15 @@ type PlanFCountRankOnlyHitIndex struct {
 	HitSerialID string
 }
 
-func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, compare_hit lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex) {
+// 產生 累積的 datas 與 下一期中獎號碼的關係圖
+func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, compare_hit *lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex) {
 	fmt.Printf("=== PlanE.ExportOnlyHitIndexes ===\n")
-	fmt.Printf("下一期參數: %+v\n", compare_hit)
+	fmt.Printf("hit 參數: %+v\n", compare_hit)
 
 	results = []PlanFCountRankOnlyHitIndex{}
 	//
 	hit_map := func() map[int]struct{} {
-		if compare_hit == (lotto649op.Lotto649OPData{}) {
+		if compare_hit == nil {
 			return map[int]struct{}{0: {}}
 		}
 
@@ -242,6 +261,11 @@ func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, com
 			n7: {},
 		}
 	}()
+	//
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Count < datas[j].Count
+	})
+	//
 	for index, data := range datas {
 		results = append(results, PlanFCountRankOnlyHitIndex{
 			Num:         data.Num,

@@ -1,4 +1,4 @@
-package flowactions
+package flow
 
 import (
 	"fmt"
@@ -58,7 +58,7 @@ func (flow *FlowB) Run(start_id int, op_times int, op lotto649op.ILotto649OP) (f
 		}
 		end := data.Date
 		flow_a := NewFlowA(op, start, end).SetAllSetsMap(all_sets_map)
-		results := flow_a.Run().GetRankAndExportOnlyHitIndexes()
+		results, _ := flow_a.Run().GetRankAndExportOnlyHitIndexes()
 		final_result = append(final_result, results)
 	}
 	return

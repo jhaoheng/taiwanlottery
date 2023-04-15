@@ -1,4 +1,4 @@
-package flowactions
+package flow
 
 import (
 	"bufio"
@@ -73,8 +73,8 @@ func Test_flowb_import(t *testing.T) {
 			})
 		}
 		// fmt.Println(sid, "==>", num_indexes)
-
-		if _, err := model.NewNumIndexHit().SetSID(sid).SetNumIndexes(num_indexes).Create(); err != nil {
+		sid_int, _ := strconv.Atoi(sid)
+		if _, err := model.NewNumIndexHit().SetSID(sid_int).SetNumIndexes(num_indexes).Create(); err != nil {
 			panic(err)
 		}
 	}

@@ -29,7 +29,7 @@ func Test_NumIndexHit_Create(t *testing.T) {
 				Hit:   is_hit,
 			})
 	}
-	item, err := NewNumIndexHit().SetSID("test").SetNumIndexes(num_indexes).Create()
+	item, err := NewNumIndexHit().SetSID(12345).SetNumIndexes(num_indexes).Create()
 	if !assert.NoError(t, err) {
 		t.Fatal()
 	}

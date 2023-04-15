@@ -2,16 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/flowactions"
-	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
-	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/plan"
-	"github.com/jhaoheng/taiwanlottery/lotto649op"
+	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/flow"
 	"github.com/jhaoheng/taiwanlottery/model"
-	"gorm.io/gorm"
 )
 
 /*
@@ -20,10 +16,6 @@ import (
 	module.GetAllPossiblility(op) // 取得所有組數, 並寫入資料庫
 */
 
-var raw_results []model.Lottery
-
-var op lotto649op.ILotto649OP
-
 func main() {
 	// model.IsDebug = true
 	err := model.ConnMySQL()
@@ -31,62 +23,15 @@ func main() {
 		panic(err)
 	}
 
-	raw_results, _ = model.NewLottery().FindAll()
-	op = lotto649op.NewLotto649OP(raw_results)
+	sid_start := 104000001
+	sid_end := 104000109
 
-	//
-	loc, _ := time.LoadLocation("Asia/Taipei")
-	start, err := time.ParseInLocation("2006-01-02", "1973-01-01", loc)
-	if err != nil {
-		panic(err)
+	for i := sid_start; i <= sid_end; i++ {
+		inferential_sid := i
+		flow_c := flow.NewFlowC(inferential_sid)
+		csv_datas := flow_c.RunPlansAndGetReports()
+		flow_c.SaveReports(csv_datas, "預測_"+strconv.Itoa(inferential_sid))
 	}
-	// end, err := time.ParseInLocation("2006-01-02", "2023-02-17", loc)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	_, all_sets_map := module.NewAllSets().Get()
-	final_result := [][]plan.PlanFCountRankOnlyHitIndex{}
-	start_id := 768
-	for i := start_id; i < len(raw_results); i++ {
-		data, err := model.NewLottery().SetID(int64(i)).Take()
-		if err != nil && err != gorm.ErrRecordNotFound {
-			panic(err)
-		}
-		end := data.Date
-		flow_a := flowactions.NewFlowA(op, start, end).SetAllSetsMap(all_sets_map)
-		results := flow_a.Run().GetRankAndExportOnlyHitIndexes()
-		final_result = append(final_result, results)
-	}
-
-	/*
-		建立 csv
-	*/
-	fmt.Println("=== 開始建立 csv ===")
-	BreakLineTag := "\r\n"
-
-	csv := ""
-
-	for i := 1; i <= 49; i++ {
-		csv = csv + "," + fmt.Sprintf("%v", i)
-	}
-	csv = csv + BreakLineTag
-
-	for i := 0; i < len(final_result); i++ {
-		csv = csv + final_result[i][0].HitSerialID
-		for j := 0; j < len(final_result[i]); j++ {
-			value := ""
-			if final_result[i][j].Hit {
-				value = "1"
-			}
-			csv = csv + "," + fmt.Sprintf("%v", value)
-		}
-		csv = csv + BreakLineTag
-	}
-
-	// fmt.Println(csv)
-	os.WriteFile("test.csv", []byte(csv), 0777)
-
 }
 
 func WriteToDB(all_sets_map map[string]struct{}) {

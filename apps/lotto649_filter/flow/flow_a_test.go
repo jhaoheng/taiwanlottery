@@ -1,4 +1,4 @@
-package flowactions
+package flow
 
 import (
 	"fmt"
@@ -6,11 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/plan"
 	"github.com/jhaoheng/taiwanlottery/lotto649op"
 	"github.com/jhaoheng/taiwanlottery/model"
 )
 
+/*
+- 欄位: index, num, count, next_sid_hit
+- index: num 的 count 排序
+- num: 數字 1-49
+- count: 每個 num 可能出現的機率
+- next_sid_hit: 下一期的中獎號碼
+*/
 func Test_flowa_GetRankAndCSV(t *testing.T) {
 	model.ConnMySQL()
 	raw_results, _ := model.NewLottery().FindAll()
@@ -36,6 +42,10 @@ func Test_flowa_GetRankAndCSV(t *testing.T) {
 	fmt.Println("輸出完畢,", filename)
 }
 
+/*
+- 產生以指定 sid（sid）中獎號碼 在 index(累積數據後建立的 index) 的關係
+- 設定 "2023-04-07" 會產生包含下一期的報表
+*/
 func Test_flowa_GetRankAndExportOnlyHitIndexes(t *testing.T) {
 	model.ConnMySQL()
 	raw_results, _ := model.NewLottery().FindAll()
@@ -52,36 +62,7 @@ func Test_flowa_GetRankAndExportOnlyHitIndexes(t *testing.T) {
 	}
 	//
 	plan_a := NewFlowA(op, start, end).Run()
-	result := plan_a.GetRankAndExportOnlyHitIndexes()
-	//
-
-	final_result := [][]plan.PlanFCountRankOnlyHitIndex{}
-	final_result = append(final_result, result)
-
-	/*
-		建立 csv
-	*/
-	fmt.Println("=== 開始建立 csv ===")
-	BreakLineTag := "\r\n"
-
-	csv := ""
-
-	for i := 1; i <= 49; i++ {
-		csv = csv + "," + fmt.Sprintf("%v", i)
-	}
-	csv = csv + BreakLineTag
-
-	for i := 0; i < len(final_result); i++ {
-		csv = csv + final_result[i][0].HitSerialID
-		for j := 0; j < len(final_result[i]); j++ {
-			value := ""
-			if final_result[i][j].Hit {
-				value = "1"
-			}
-			csv = csv + "," + fmt.Sprintf("%v", value)
-		}
-		csv = csv + BreakLineTag
-	}
+	_, csv := plan_a.GetRankAndExportOnlyHitIndexes()
 
 	// fmt.Println(csv)
 	filename := plan_a.GetNextHit().SerialID + "-2.csv"
