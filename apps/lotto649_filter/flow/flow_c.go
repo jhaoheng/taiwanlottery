@@ -145,7 +145,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 		csv := plan_g.ExportCSV(sums)
 
 		return &CSVData{
-			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.LastSID),
+			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.InferentialSID),
 			CSV:      csv,
 		}
 	}()

@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	for id := 437; id < 1039; id++ {
+	for id := 769; id < 1039; id++ {
 		item, err := model.NewLottery().SetID(int64(id)).Take()
 		if err != nil {
 			panic(err)

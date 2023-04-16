@@ -188,7 +188,19 @@ func (plan *PlanFCountRank) ExportCSV(datas []PlanFCountRankItem, hit, next_hit 
 	}
 
 	BreakLineTag := "\r\n"
-	csv = fmt.Sprintf(",num,count,hit(%v),next_hit(%v)", hit.SerialID, next_hit.SerialID) + BreakLineTag
+	hit_sid := func() string {
+		if hit != nil {
+			return hit.SerialID
+		}
+		return ""
+	}()
+	next_hit_sid := func() string {
+		if next_hit != nil {
+			return next_hit.SerialID
+		}
+		return ""
+	}()
+	csv = fmt.Sprintf(",num,count,hit(%v),next_hit(%v)", hit_sid, next_hit_sid) + BreakLineTag
 
 	// 取得 hit_map
 	hit_map := get_map(hit)

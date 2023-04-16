@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/jhaoheng/taiwanlottery/model"
+	"gorm.io/gorm"
 )
 
 /*
@@ -30,7 +31,10 @@ func NewPlanG() IPlanG {
 // 取得指定 sid 的 hum_index_sum 資料
 func (plan *PlanG) Get(table_name, sid string) (sums []model.NumIndexHitSum) {
 	sid_int, _ := strconv.Atoi(sid)
-	if _, err := model.NewNumIndexHit(table_name).SetSID(sid_int).Take(); err != nil {
+	if _, err := model.NewNumIndexHit(table_name).SetSID(sid_int).Take(); err != nil && err != gorm.ErrRecordNotFound {
+		if err == gorm.ErrRecordNotFound {
+			return nil
+		}
 		panic(err)
 	}
 	sums = []model.NumIndexHitSum{}
