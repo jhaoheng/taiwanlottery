@@ -19,9 +19,8 @@ type IPlanG interface {
 }
 
 type PlanG struct {
-}
-
-type PlanGResult struct {
+	SID               int
+	SIDNumIndexHitMap map[int]int // 在 num_index_hit 中，hit 的 index
 }
 
 func NewPlanG() IPlanG {
@@ -30,16 +29,15 @@ func NewPlanG() IPlanG {
 
 // 取得指定 sid 的 hum_index_sum 資料
 func (plan *PlanG) Get(table_name, sid string) (sums []model.NumIndexHitSum) {
-	sid_int, _ := strconv.Atoi(sid)
-	if _, err := model.NewNumIndexHit(table_name).SetSID(sid_int).Take(); err != nil && err != gorm.ErrRecordNotFound {
-		if err == gorm.ErrRecordNotFound {
-			return nil
-		}
+	plan.SID, _ = strconv.Atoi(sid)
+	if datas, err := model.NewNumIndexHit(table_name).SetSID(plan.SID).Take(); err != nil && err != gorm.ErrRecordNotFound {
 		panic(err)
+	} else {
+		plan.SIDNumIndexHitMap = datas.ExportNumsToMap()
 	}
 	sums = []model.NumIndexHitSum{}
 	for i := 1; i <= 49; i++ {
-		sum, _ := model.NewNumIndexHit(table_name).Sum(sid_int, i)
+		sum, _ := model.NewNumIndexHit(table_name).Sum(plan.SID, i)
 		sums = append(sums, sum)
 	}
 
@@ -91,12 +89,25 @@ func (plan *PlanG) ExportCSV(sums []model.NumIndexHitSum) (csv string) {
 
 	//
 	BreakLineTag := "\r\n"
-	csv = "indexes,sum,count" + BreakLineTag
+	csv = "indexes,sum,count,hit" + BreakLineTag
 	for _, result := range results {
 		// fmt.Printf("%+v\n", result)
 		csv = csv + fmt.Sprintf("%v", result.Indexes) + ","
 		csv = csv + fmt.Sprintf("%d", result.Total) + ","
-		csv = csv + fmt.Sprintf("%d", result.Count) + BreakLineTag
+		csv = csv + fmt.Sprintf("%d", result.Count) + ","
+
+		text := ""
+		for _, numindex := range result.Indexes {
+			if plan.SIDNumIndexHitMap[numindex] == 1 {
+				if len(text) != 0 {
+					text = text + " "
+				}
+				text = text + fmt.Sprintf("%d", numindex)
+			}
+		}
+		csv = csv + fmt.Sprintf("%v", text)
+
+		csv = csv + BreakLineTag
 	}
 
 	return

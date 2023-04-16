@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/module"
 	"github.com/jhaoheng/taiwanlottery/apps/lotto649_filter/plan"
 	"github.com/jhaoheng/taiwanlottery/lotto649op"
 	"github.com/jhaoheng/taiwanlottery/model"
@@ -40,7 +39,7 @@ type FlowC struct {
 }
 
 // inferential_sid: 要預測的 sid
-func NewFlowC(inferential_sid int) IFlowC {
+func NewFlowC(inferential_sid int, all_sets_map map[string]struct{}) IFlowC {
 	first_sid := 103000001
 	last_sid := inferential_sid - 1
 	lotterys, err := model.NewLottery().FindBetweenSID(strconv.Itoa(first_sid), strconv.Itoa(last_sid))
@@ -53,10 +52,10 @@ func NewFlowC(inferential_sid int) IFlowC {
 	op.GetLotto649OPDatas()
 	all_hits := op.GetLotto649OPDatas()
 	//
+	fmt.Println()
 	fmt.Printf("全部 his 有: %v\n", len(all_hits))
 	fmt.Printf("第一期期數: %v, 最後一期期數: %v\n", all_hits[0].SerialID, all_hits[len(all_hits)-1].SerialID)
 	fmt.Printf("預測 sid: %d\n", inferential_sid)
-	fmt.Println()
 
 	/*
 		修正正確的 last_sid, 因為有可能 last_sid = 104000001 - 1 = 104000000, 此為錯誤的 sid
@@ -67,15 +66,24 @@ func NewFlowC(inferential_sid int) IFlowC {
 	}()
 
 	//
-	_, all_sets_map := module.NewAllSets().Get()
-	fmt.Println("all_sets_map 一開始有:", len(all_sets_map))
+	new_all_sets_map := map[string]struct{}{}
+	for key := range all_sets_map {
+		new_all_sets_map[key] = struct{}{}
+	}
+
+	fmt.Println("new_all_sets_map 一開始有:", len(new_all_sets_map))
+	if len(new_all_sets_map) != 13983816 {
+		err := fmt.Errorf("new_all_sets_map 數字錯誤, %v", len(new_all_sets_map))
+		panic(err)
+	}
+	fmt.Println()
 	return &FlowC{
 		op:             op,
 		InferentialSID: inferential_sid,
 		FirstSID:       first_sid,
 		LastSID:        last_sid,
 		AllHits:        all_hits,
-		AllSetsMap:     all_sets_map,
+		AllSetsMap:     new_all_sets_map,
 	}
 }
 
@@ -120,9 +128,12 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 	/*
 		執行 plan_f 取得報表
 	*/
-	csv_data_1 := flow.GetReport_1(all_sets_map)
-	csv_data_2 := flow.GetReport_2(all_sets_map)
-	csv_data_3 := flow.GetReport_3(all_sets_map)
+	//
+	plan_f := plan.NewPlanFCountRank(all_sets_map)
+	ranks := plan_f.GetRank()
+	csv_data_1 := flow.GetReport_1(plan_f, ranks, all_sets_map)
+	csv_data_2 := flow.GetReport_2(plan_f, ranks, all_sets_map)
+	csv_data_3 := flow.GetReport_3(plan_f, ranks, all_sets_map)
 
 	/*
 		- 取得 plan_g 報表
@@ -134,7 +145,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 		csv := plan_g.ExportCSV(sums)
 
 		return &CSVData{
-			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.LastSID),
+			Filename: fmt.Sprintf("%v_plan_g_趨勢圖_本期.csv", flow.LastSID),
 			CSV:      csv,
 		}
 	}()
@@ -145,7 +156,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 		csv := plan_g.ExportCSV(sums)
 
 		return &CSVData{
-			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.InferentialSID),
+			Filename: fmt.Sprintf("%v_plan_g_趨勢圖_預測.csv", flow.InferentialSID),
 			CSV:      csv,
 		}
 	}()
@@ -158,10 +169,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 /*
 - 取得報表 1
 */
-func (flow *FlowC) GetReport_1(all_sets_map map[string]struct{}) *CSVData {
-	//
-	plan_f := plan.NewPlanFCountRank(all_sets_map)
-	ranks := plan_f.GetRank()
+func (flow *FlowC) GetReport_1(plan_f plan.IPlanFCountRank, ranks []plan.PlanFCountRankItem, all_sets_map map[string]struct{}) *CSVData {
 	//
 	csv_data_1 := CSVData{
 		Filename: fmt.Sprintf("%v_plan_f_nums_count累積_排序.csv", flow.LastSID),
@@ -188,14 +196,10 @@ func (flow *FlowC) GetReport_1(all_sets_map map[string]struct{}) *CSVData {
 - 取得報表 2, 最後一期中獎號碼與累積數據的關係
 - 寫入 num_index_hit
 */
-func (flow *FlowC) GetReport_2(all_sets_map map[string]struct{}) *CSVData {
-	//
-	plan_f := plan.NewPlanFCountRank(all_sets_map)
-	ranks := plan_f.GetRank()
-	//
+func (flow *FlowC) GetReport_2(plan_f plan.IPlanFCountRank, ranks []plan.PlanFCountRankItem, all_sets_map map[string]struct{}) *CSVData {
 	last_hit := flow.AllHits[len(flow.AllHits)-1]
 	csv_data_2 := CSVData{
-		Filename: fmt.Sprintf("%v_plan_f_hit_落點.csv", last_hit.SerialID),
+		Filename: fmt.Sprintf("%v_plan_f_hit_落點_本期.csv", last_hit.SerialID),
 		CSV: func() string {
 			results := plan_f.ExportOnlyHitIndexes(ranks, &last_hit)
 
@@ -253,10 +257,7 @@ func (flow *FlowC) GetReport_2(all_sets_map map[string]struct{}) *CSVData {
 - 如果沒有下一期中獎號碼，則不運算
 - 寫入 num_index_next_hit
 */
-func (flow *FlowC) GetReport_3(all_sets_map map[string]struct{}) *CSVData {
-	//
-	plan_f := plan.NewPlanFCountRank(all_sets_map)
-	ranks := plan_f.GetRank()
+func (flow *FlowC) GetReport_3(plan_f plan.IPlanFCountRank, ranks []plan.PlanFCountRankItem, all_sets_map map[string]struct{}) *CSVData {
 	// 取得下一期中獎號碼, 如果沒有則不運算
 	next_hit := func() *lotto649op.Lotto649OPData {
 		// 檢查 inferential_sid 是否存在資料庫
@@ -275,7 +276,7 @@ func (flow *FlowC) GetReport_3(all_sets_map map[string]struct{}) *CSVData {
 	}
 
 	csv_data_3 := CSVData{
-		Filename: fmt.Sprintf("%v_plan_f_hit_落點.csv", next_hit.SerialID),
+		Filename: fmt.Sprintf("%v_plan_f_hit_落點_預測.csv", next_hit.SerialID),
 		CSV: func() string {
 			results := plan_f.ExportOnlyHitIndexes(ranks, next_hit)
 
