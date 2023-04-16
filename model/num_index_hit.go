@@ -17,67 +17,65 @@ type INumIndexHit interface {
 }
 
 type NumIndexHit struct {
-	db        *gorm.DB `gorm:"-"`
-	ID        int64
-	SID       int `gorm:"column:sid"`
-	NumIdx_1  int `gorm:"column:num_idx_1"` // 數字在 SID 中的數量排名
-	NumIdx_2  int `gorm:"column:num_idx_2"`
-	NumIdx_3  int `gorm:"column:num_idx_3"`
-	NumIdx_4  int `gorm:"column:num_idx_4"`
-	NumIdx_5  int `gorm:"column:num_idx_5"`
-	NumIdx_6  int `gorm:"column:num_idx_6"`
-	NumIdx_7  int `gorm:"column:num_idx_7"`
-	NumIdx_8  int `gorm:"column:num_idx_8"`
-	NumIdx_9  int `gorm:"column:num_idx_9"`
-	NumIdx_10 int `gorm:"column:num_idx_10"`
-	NumIdx_11 int `gorm:"column:num_idx_11"`
-	NumIdx_12 int `gorm:"column:num_idx_12"`
-	NumIdx_13 int `gorm:"column:num_idx_13"`
-	NumIdx_14 int `gorm:"column:num_idx_14"`
-	NumIdx_15 int `gorm:"column:num_idx_15"`
-	NumIdx_16 int `gorm:"column:num_idx_16"`
-	NumIdx_17 int `gorm:"column:num_idx_17"`
-	NumIdx_18 int `gorm:"column:num_idx_18"`
-	NumIdx_19 int `gorm:"column:num_idx_19"`
-	NumIdx_20 int `gorm:"column:num_idx_20"`
-	NumIdx_21 int `gorm:"column:num_idx_21"`
-	NumIdx_22 int `gorm:"column:num_idx_22"`
-	NumIdx_23 int `gorm:"column:num_idx_23"`
-	NumIdx_24 int `gorm:"column:num_idx_24"`
-	NumIdx_25 int `gorm:"column:num_idx_25"`
-	NumIdx_26 int `gorm:"column:num_idx_26"`
-	NumIdx_27 int `gorm:"column:num_idx_27"`
-	NumIdx_28 int `gorm:"column:num_idx_28"`
-	NumIdx_29 int `gorm:"column:num_idx_29"`
-	NumIdx_30 int `gorm:"column:num_idx_30"`
-	NumIdx_31 int `gorm:"column:num_idx_31"`
-	NumIdx_32 int `gorm:"column:num_idx_32"`
-	NumIdx_33 int `gorm:"column:num_idx_33"`
-	NumIdx_34 int `gorm:"column:num_idx_34"`
-	NumIdx_35 int `gorm:"column:num_idx_35"`
-	NumIdx_36 int `gorm:"column:num_idx_36"`
-	NumIdx_37 int `gorm:"column:num_idx_37"`
-	NumIdx_38 int `gorm:"column:num_idx_38"`
-	NumIdx_39 int `gorm:"column:num_idx_39"`
-	NumIdx_40 int `gorm:"column:num_idx_40"`
-	NumIdx_41 int `gorm:"column:num_idx_41"`
-	NumIdx_42 int `gorm:"column:num_idx_42"`
-	NumIdx_43 int `gorm:"column:num_idx_43"`
-	NumIdx_44 int `gorm:"column:num_idx_44"`
-	NumIdx_45 int `gorm:"column:num_idx_45"`
-	NumIdx_46 int `gorm:"column:num_idx_46"`
-	NumIdx_47 int `gorm:"column:num_idx_47"`
-	NumIdx_48 int `gorm:"column:num_idx_48"`
-	NumIdx_49 int `gorm:"column:num_idx_49"`
+	table_name string   `gorm:"-"`
+	db         *gorm.DB `gorm:"-"`
+	ID         int64
+	SID        int `gorm:"column:sid"`
+	NumIdx_1   int `gorm:"column:num_idx_1"` // 數字在 SID 中的數量排名
+	NumIdx_2   int `gorm:"column:num_idx_2"`
+	NumIdx_3   int `gorm:"column:num_idx_3"`
+	NumIdx_4   int `gorm:"column:num_idx_4"`
+	NumIdx_5   int `gorm:"column:num_idx_5"`
+	NumIdx_6   int `gorm:"column:num_idx_6"`
+	NumIdx_7   int `gorm:"column:num_idx_7"`
+	NumIdx_8   int `gorm:"column:num_idx_8"`
+	NumIdx_9   int `gorm:"column:num_idx_9"`
+	NumIdx_10  int `gorm:"column:num_idx_10"`
+	NumIdx_11  int `gorm:"column:num_idx_11"`
+	NumIdx_12  int `gorm:"column:num_idx_12"`
+	NumIdx_13  int `gorm:"column:num_idx_13"`
+	NumIdx_14  int `gorm:"column:num_idx_14"`
+	NumIdx_15  int `gorm:"column:num_idx_15"`
+	NumIdx_16  int `gorm:"column:num_idx_16"`
+	NumIdx_17  int `gorm:"column:num_idx_17"`
+	NumIdx_18  int `gorm:"column:num_idx_18"`
+	NumIdx_19  int `gorm:"column:num_idx_19"`
+	NumIdx_20  int `gorm:"column:num_idx_20"`
+	NumIdx_21  int `gorm:"column:num_idx_21"`
+	NumIdx_22  int `gorm:"column:num_idx_22"`
+	NumIdx_23  int `gorm:"column:num_idx_23"`
+	NumIdx_24  int `gorm:"column:num_idx_24"`
+	NumIdx_25  int `gorm:"column:num_idx_25"`
+	NumIdx_26  int `gorm:"column:num_idx_26"`
+	NumIdx_27  int `gorm:"column:num_idx_27"`
+	NumIdx_28  int `gorm:"column:num_idx_28"`
+	NumIdx_29  int `gorm:"column:num_idx_29"`
+	NumIdx_30  int `gorm:"column:num_idx_30"`
+	NumIdx_31  int `gorm:"column:num_idx_31"`
+	NumIdx_32  int `gorm:"column:num_idx_32"`
+	NumIdx_33  int `gorm:"column:num_idx_33"`
+	NumIdx_34  int `gorm:"column:num_idx_34"`
+	NumIdx_35  int `gorm:"column:num_idx_35"`
+	NumIdx_36  int `gorm:"column:num_idx_36"`
+	NumIdx_37  int `gorm:"column:num_idx_37"`
+	NumIdx_38  int `gorm:"column:num_idx_38"`
+	NumIdx_39  int `gorm:"column:num_idx_39"`
+	NumIdx_40  int `gorm:"column:num_idx_40"`
+	NumIdx_41  int `gorm:"column:num_idx_41"`
+	NumIdx_42  int `gorm:"column:num_idx_42"`
+	NumIdx_43  int `gorm:"column:num_idx_43"`
+	NumIdx_44  int `gorm:"column:num_idx_44"`
+	NumIdx_45  int `gorm:"column:num_idx_45"`
+	NumIdx_46  int `gorm:"column:num_idx_46"`
+	NumIdx_47  int `gorm:"column:num_idx_47"`
+	NumIdx_48  int `gorm:"column:num_idx_48"`
+	NumIdx_49  int `gorm:"column:num_idx_49"`
 }
 
-func (NumIndexHit) TableName() string {
-	return "num_index_hit"
-}
-
-func NewNumIndexHit() INumIndexHit {
+func NewNumIndexHit(table_name string) INumIndexHit {
 	return &NumIndexHit{
-		db: db,
+		table_name: table_name,
+		db:         db,
 	}
 }
 
@@ -206,18 +204,18 @@ func (model *NumIndexHit) SetNumIndexes(datas []NumIndex) *NumIndexHit {
 
 func (model *NumIndexHit) Take() (NumIndexHit, error) {
 	output := NumIndexHit{}
-	tx := model.db.Where(model).Take(&output)
+	tx := model.db.Table(model.table_name).Where(model).Take(&output)
 	return output, tx.Error
 }
 
 func (model *NumIndexHit) FinaAll() ([]NumIndexHit, error) {
 	output := []NumIndexHit{}
-	tx := model.db.Where(model).Find(&output)
+	tx := model.db.Table(model.table_name).Where(model).Find(&output)
 	return output, tx.Error
 }
 
 func (model *NumIndexHit) Create() (NumIndexHit, error) {
-	tx := model.db.Create(model)
+	tx := model.db.Table(model.table_name).Create(model)
 	return *model, tx.Error
 }
 
@@ -227,14 +225,13 @@ type NumIndexHitSum struct {
 }
 
 // 取得 <=sid 的指定數字總和
-func (model *NumIndexHit) Sum(sid, index int) (NumIndexHitSum, error) {
+func (model *NumIndexHit) Sum(end_sid, index int) (NumIndexHitSum, error) {
 	result := NumIndexHitSum{
 		Index: index,
 		Total: 0,
 	}
 	//
-
-	w := fmt.Sprintf("`sid` <= %d AND `num_idx_%d`=1", sid, index)
-	tx := model.db.Table("num_index_hit").Select("sum(1) as total").Where(w).Find(&result)
+	w := fmt.Sprintf("`sid` <= %d AND `num_idx_%d`=1", end_sid, index)
+	tx := model.db.Table(model.table_name).Select("sum(1) as total").Where(w).Find(&result)
 	return result, tx.Error
 }

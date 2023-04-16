@@ -13,7 +13,7 @@ import (
 */
 
 type IPlanG interface {
-	Get(sid string) (sums []model.NumIndexHitSum)
+	Get(table_name, sid string) (sums []model.NumIndexHitSum)
 	ExportCSV(sums []model.NumIndexHitSum) (csv string)
 }
 
@@ -28,14 +28,14 @@ func NewPlanG() IPlanG {
 }
 
 // 取得指定 sid 的 hum_index_sum 資料
-func (plan *PlanG) Get(sid string) (sums []model.NumIndexHitSum) {
+func (plan *PlanG) Get(table_name, sid string) (sums []model.NumIndexHitSum) {
 	sid_int, _ := strconv.Atoi(sid)
-	if _, err := model.NewNumIndexHit().SetSID(sid_int).Take(); err != nil {
+	if _, err := model.NewNumIndexHit(table_name).SetSID(sid_int).Take(); err != nil {
 		panic(err)
 	}
 	sums = []model.NumIndexHitSum{}
 	for i := 1; i <= 49; i++ {
-		sum, _ := model.NewNumIndexHit().Sum(sid_int, i)
+		sum, _ := model.NewNumIndexHit(table_name).Sum(sid_int, i)
 		sums = append(sums, sum)
 	}
 

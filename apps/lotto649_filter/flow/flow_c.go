@@ -25,9 +25,9 @@ import (
 */
 
 type IFlowC interface {
-	RunPlansAndGetReports() []CSVData
+	RunPlansAndGetReports() []*CSVData
 	// folderName, ex: 112000042
-	SaveReports(csvs []CSVData, folderName string)
+	SaveReports(csvs []*CSVData, folderName string)
 }
 
 type FlowC struct {
@@ -68,6 +68,7 @@ func NewFlowC(inferential_sid int) IFlowC {
 
 	//
 	_, all_sets_map := module.NewAllSets().Get()
+	fmt.Println("all_sets_map 一開始有:", len(all_sets_map))
 	return &FlowC{
 		op:             op,
 		InferentialSID: inferential_sid,
@@ -90,7 +91,7 @@ type CSVData struct {
  1. 以當前可能的數字資料, 輸出 index,num,count 報表
  2. 以當前可能的數字資料, 輸出 最後一期中獎號碼的數字落點 報表
 */
-func (flow *FlowC) RunPlansAndGetReports() []CSVData {
+func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 
 	//
 	all_sets_map := flow.AllSetsMap
@@ -119,110 +120,216 @@ func (flow *FlowC) RunPlansAndGetReports() []CSVData {
 	/*
 		執行 plan_f 取得報表
 	*/
-	csv_data_1, csv_data_2 := func() (csv_data_1 CSVData, csv_data_2 CSVData) {
-		//
-		plan_f := plan.NewPlanFCountRank(flow.AllSetsMap)
-		ranks := plan_f.GetRank()
-
-		// 取得報表 1
-		csv_data_1 = CSVData{
-			Filename: fmt.Sprintf("%v_plan_f_nums_count累積_排序.csv", flow.LastSID),
-			CSV: plan_f.ExportCSV(
-				ranks,
-				&flow.AllHits[len(flow.AllHits)-1],
-				func() *lotto649op.Lotto649OPData {
-					// 檢查 inferential_sid 是否存在資料庫
-					datas, err := model.NewLottery().SetSerialID(strconv.Itoa(flow.InferentialSID)).FindAll()
-					if err != nil {
-						panic(err)
-					}
-					if len(datas) == 0 {
-						return nil
-					}
-					return &lotto649op.NewLotto649OP(datas).GetLotto649OPDatas()[0]
-				}(),
-			),
-		}
-
-		// 取得報表 2, 取得, 最後一期中獎號碼的關係圖
-		last_hit := flow.AllHits[len(flow.AllHits)-1]
-		csv_data_2 = CSVData{
-			Filename: fmt.Sprintf("%v_plan_f_hit_落點.csv", last_hit.SerialID),
-			CSV: func() string {
-				results := plan_f.ExportOnlyHitIndexes(ranks, &last_hit)
-
-				// 將 data 寫入 table::num_index_hit, 如果資料不存在
-				sid_int, _ := strconv.Atoi(last_hit.SerialID)
-				if _, err := model.NewNumIndexHit().SetSID(sid_int).Take(); err != nil && err != gorm.ErrRecordNotFound {
-					panic(err)
-				} else if err == gorm.ErrRecordNotFound {
-					num_indexes := []model.NumIndex{}
-					for _, result := range results {
-						num_indexes = append(num_indexes, model.NumIndex{
-							Index: result.Index,
-							Hit: func() int {
-								if result.Hit {
-									return 1
-								}
-								return 0
-							}(),
-						})
-					}
-					if _, err := model.NewNumIndexHit().SetSID(sid_int).SetNumIndexes(num_indexes).Create(); err != nil {
-						panic(err)
-					}
-				}
-
-				//建立這一次檔案的 csv
-				csv := ""
-				BreakLineTag := "\r\n"
-
-				for i := 1; i <= 49; i++ {
-					csv = csv + "," + fmt.Sprintf("%v", i)
-				}
-				csv = csv + BreakLineTag
-
-				// //
-				// b, _ := json.MarshalIndent(results, "", "	")
-				// fmt.Println(string(b))
-				csv = csv + results[0].HitSerialID
-				for _, result := range results {
-					value := ""
-					if result.Hit {
-						value = "1"
-					}
-					csv = csv + "," + fmt.Sprintf("%v", value)
-				}
-				csv = csv + BreakLineTag
-				return csv
-			}(),
-		}
-		return
-	}()
-	//
+	csv_data_1 := flow.GetReport_1(all_sets_map)
+	csv_data_2 := flow.GetReport_2(all_sets_map)
+	csv_data_3 := flow.GetReport_3(all_sets_map)
 
 	/*
 		- 取得 plan_g 報表
 	*/
-	csv_data_3 := func() CSVData {
+	// 從 table::num_index_hit 中取得
+	plan_g_from_csv_data_2 := func() *CSVData {
 		plan_g := plan.NewPlanG()
-		sums := plan_g.Get(strconv.Itoa(flow.LastSID))
+		sums := plan_g.Get("num_index_hit", strconv.Itoa(flow.LastSID))
 		csv := plan_g.ExportCSV(sums)
 
-		return CSVData{
+		return &CSVData{
 			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.LastSID),
 			CSV:      csv,
 		}
 	}()
+	// 從 table::num_index_next_hit 中取得
+	plan_g_from_csv_data_3 := func() *CSVData {
+		plan_g := plan.NewPlanG()
+		sums := plan_g.Get("num_index_next_hit", strconv.Itoa(flow.InferentialSID))
+		csv := plan_g.ExportCSV(sums)
 
+		return &CSVData{
+			Filename: fmt.Sprintf("%v_plan_g_趨勢圖.csv", flow.LastSID),
+			CSV:      csv,
+		}
+	}()
 	//
-	csv_datas := []CSVData{}
-	csv_datas = append(csv_datas, csv_data_1, csv_data_2, csv_data_3)
+	csv_datas := []*CSVData{}
+	csv_datas = append(csv_datas, csv_data_1, csv_data_2, csv_data_3, plan_g_from_csv_data_2, plan_g_from_csv_data_3)
 	return csv_datas
 }
 
+/*
+- 取得報表 1
+*/
+func (flow *FlowC) GetReport_1(all_sets_map map[string]struct{}) *CSVData {
+	//
+	plan_f := plan.NewPlanFCountRank(all_sets_map)
+	ranks := plan_f.GetRank()
+	//
+	csv_data_1 := CSVData{
+		Filename: fmt.Sprintf("%v_plan_f_nums_count累積_排序.csv", flow.LastSID),
+		CSV: plan_f.ExportCSV(
+			ranks,
+			&flow.AllHits[len(flow.AllHits)-1],
+			func() *lotto649op.Lotto649OPData {
+				// 檢查 inferential_sid 是否存在資料庫
+				datas, err := model.NewLottery().SetSerialID(strconv.Itoa(flow.InferentialSID)).FindAll()
+				if err != nil {
+					panic(err)
+				}
+				if len(datas) == 0 {
+					return nil
+				}
+				return &lotto649op.NewLotto649OP(datas).GetLotto649OPDatas()[0]
+			}(),
+		),
+	}
+	return &csv_data_1
+}
+
+/*
+- 取得報表 2, 最後一期中獎號碼與累積數據的關係
+- 寫入 num_index_hit
+*/
+func (flow *FlowC) GetReport_2(all_sets_map map[string]struct{}) *CSVData {
+	//
+	plan_f := plan.NewPlanFCountRank(all_sets_map)
+	ranks := plan_f.GetRank()
+	//
+	last_hit := flow.AllHits[len(flow.AllHits)-1]
+	csv_data_2 := CSVData{
+		Filename: fmt.Sprintf("%v_plan_f_hit_落點.csv", last_hit.SerialID),
+		CSV: func() string {
+			results := plan_f.ExportOnlyHitIndexes(ranks, &last_hit)
+
+			// 將 data 寫入 table::num_index_hit, 如果資料不存在
+			sid_int, _ := strconv.Atoi(last_hit.SerialID)
+			if _, err := model.NewNumIndexHit("num_index_hit").SetSID(sid_int).Take(); err != nil && err != gorm.ErrRecordNotFound {
+				panic(err)
+			} else if err == gorm.ErrRecordNotFound {
+				num_indexes := []model.NumIndex{}
+				for _, result := range results {
+					num_indexes = append(num_indexes, model.NumIndex{
+						Index: result.Index,
+						Hit: func() int {
+							if result.Hit {
+								return 1
+							}
+							return 0
+						}(),
+					})
+				}
+				if _, err := model.NewNumIndexHit("num_index_hit").SetSID(sid_int).SetNumIndexes(num_indexes).Create(); err != nil {
+					panic(err)
+				}
+			}
+
+			//建立這一次檔案的 csv
+			csv := ""
+			BreakLineTag := "\r\n"
+
+			for i := 1; i <= 49; i++ {
+				csv = csv + "," + fmt.Sprintf("%v", i)
+			}
+			csv = csv + BreakLineTag
+
+			// //
+			// b, _ := json.MarshalIndent(results, "", "	")
+			// fmt.Println(string(b))
+			csv = csv + results[0].HitSerialID
+			for _, result := range results {
+				value := ""
+				if result.Hit {
+					value = "1"
+				}
+				csv = csv + "," + fmt.Sprintf("%v", value)
+			}
+			csv = csv + BreakLineTag
+			return csv
+		}(),
+	}
+	return &csv_data_2
+}
+
+/*
+- 取得報表 3, 下一期中獎號碼與累積數據的關係
+- 如果沒有下一期中獎號碼，則不運算
+- 寫入 num_index_next_hit
+*/
+func (flow *FlowC) GetReport_3(all_sets_map map[string]struct{}) *CSVData {
+	//
+	plan_f := plan.NewPlanFCountRank(all_sets_map)
+	ranks := plan_f.GetRank()
+	// 取得下一期中獎號碼, 如果沒有則不運算
+	next_hit := func() *lotto649op.Lotto649OPData {
+		// 檢查 inferential_sid 是否存在資料庫
+		datas, err := model.NewLottery().SetSerialID(strconv.Itoa(flow.InferentialSID)).FindAll()
+		if err != nil {
+			panic(err)
+		}
+		if len(datas) == 0 {
+			return nil
+		}
+		return &lotto649op.NewLotto649OP(datas).GetLotto649OPDatas()[0]
+	}()
+
+	if next_hit == nil {
+		return nil
+	}
+
+	csv_data_3 := CSVData{
+		Filename: fmt.Sprintf("%v_plan_f_hit_落點.csv", next_hit.SerialID),
+		CSV: func() string {
+			results := plan_f.ExportOnlyHitIndexes(ranks, next_hit)
+
+			// 將 data 寫入 table::num_index_next_hit, 如果資料不存在
+			sid_int, _ := strconv.Atoi(next_hit.SerialID)
+			if _, err := model.NewNumIndexHit("num_index_next_hit").SetSID(sid_int).Take(); err != nil && err != gorm.ErrRecordNotFound {
+				panic(err)
+			} else if err == gorm.ErrRecordNotFound {
+				num_indexes := []model.NumIndex{}
+				for _, result := range results {
+					num_indexes = append(num_indexes, model.NumIndex{
+						Index: result.Index,
+						Hit: func() int {
+							if result.Hit {
+								return 1
+							}
+							return 0
+						}(),
+					})
+				}
+				if _, err := model.NewNumIndexHit("num_index_next_hit").SetSID(sid_int).SetNumIndexes(num_indexes).Create(); err != nil {
+					panic(err)
+				}
+			}
+
+			//建立這一次檔案的 csv
+			csv := ""
+			BreakLineTag := "\r\n"
+
+			for i := 1; i <= 49; i++ {
+				csv = csv + "," + fmt.Sprintf("%v", i)
+			}
+			csv = csv + BreakLineTag
+
+			// //
+			// b, _ := json.MarshalIndent(results, "", "	")
+			// fmt.Println(string(b))
+			csv = csv + results[0].HitSerialID
+			for _, result := range results {
+				value := ""
+				if result.Hit {
+					value = "1"
+				}
+				csv = csv + "," + fmt.Sprintf("%v", value)
+			}
+			csv = csv + BreakLineTag
+			return csv
+		}(),
+	}
+	return &csv_data_3
+}
+
 // -
-func (flow *FlowC) SaveReports(csvs []CSVData, folderName string) {
+func (flow *FlowC) SaveReports(csvs []*CSVData, folderName string) {
 	//
 	if _, err := os.Stat(folderName); os.IsNotExist(err) {
 		// 資料夾不存在，創建資料夾
@@ -237,6 +344,9 @@ func (flow *FlowC) SaveReports(csvs []CSVData, folderName string) {
 	//
 
 	for _, csv_data := range csvs {
+		if csv_data == nil {
+			continue
+		}
 		filename := time.Now().Format("20060102150405") + "-" + csv_data.Filename
 		os.WriteFile(folderName+"/"+filename, []byte(csv_data.CSV), 0777)
 	}

@@ -23,14 +23,16 @@ func main() {
 		panic(err)
 	}
 
-	sid_start := 104000001
-	sid_end := 104000109
-
-	for i := sid_start; i <= sid_end; i++ {
-		inferential_sid := i
+	for id := 437; id < 1039; id++ {
+		item, err := model.NewLottery().SetID(int64(id)).Take()
+		if err != nil {
+			panic(err)
+		}
+		inferential_sid, _ := strconv.Atoi(item.SerialID)
 		flow_c := flow.NewFlowC(inferential_sid)
-		csv_datas := flow_c.RunPlansAndGetReports()
-		flow_c.SaveReports(csv_datas, "預測_"+strconv.Itoa(inferential_sid))
+		flow_c.RunPlansAndGetReports()
+
+		fmt.Printf("\n\n\n\n\n")
 	}
 }
 

@@ -47,6 +47,7 @@ type FlowA struct {
 	Loc            *time.Location
 	Start          time.Time
 	End            time.Time
+	CurrentHit     lotto649op.Lotto649OPData
 	NextLastestHit lotto649op.Lotto649OPData   // end 時間的下一筆中獎資訊
 	Hits           []lotto649op.Lotto649OPData // start - end 的中獎資訊
 	//
@@ -88,6 +89,7 @@ func NewFlowA(op lotto649op.ILotto649OP, start, end time.Time) IFlowA {
 	return &FlowA{
 		Start:          start,
 		End:            end,
+		CurrentHit:     hits[len(hits)-1],
 		NextLastestHit: next_lastest_hit,
 		Hits:           hits,
 	}
@@ -198,5 +200,5 @@ func (flow *FlowA) GetRankAndExportOnlyHitIndexes() (results []plan.PlanFCountRa
 func (flow *FlowA) GetRankAndCSV() (csv string) {
 	plan_f := plan.NewPlanFCountRank(flow.AllSetsMap)
 	ranks := plan_f.GetRank()
-	return plan_f.ExportCSV(ranks, nil, &flow.NextLastestHit)
+	return plan_f.ExportCSV(ranks, &flow.CurrentHit, &flow.NextLastestHit)
 }

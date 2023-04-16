@@ -87,6 +87,9 @@ type PlanFCountRankItem struct {
 	Count int `json:"count"`
 }
 
+/*
+- 取得 DataMap 中，所有數字的計數，進行排序
+*/
 func (plan *PlanFCountRank) GetRank() []PlanFCountRankItem {
 	fmt.Println("=== PlanE.GetRank ===")
 	// init
@@ -232,25 +235,29 @@ type PlanFCountRankOnlyHitIndex struct {
 	HitSerialID string
 }
 
-// 產生 累積的 datas 與 下一期中獎號碼的關係圖
-func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, compare_hit *lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex) {
+/*
+[產生 累積的 datas 與 下一期中獎號碼的關係圖]
+- datas, 累積的資料量 (不包含 next_hit 資料)
+- next_hit, 下一期的中獎號碼
+*/
+func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, next_hit *lotto649op.Lotto649OPData) (results []PlanFCountRankOnlyHitIndex) {
 	fmt.Printf("=== PlanE.ExportOnlyHitIndexes ===\n")
-	fmt.Printf("hit 參數: %+v\n", compare_hit)
+	fmt.Printf("hit 參數: %+v\n", next_hit)
 
 	results = []PlanFCountRankOnlyHitIndex{}
 	//
 	hit_map := func() map[int]struct{} {
-		if compare_hit == nil {
+		if next_hit == nil {
 			return map[int]struct{}{0: {}}
 		}
 
-		n1, _ := strconv.Atoi(compare_hit.Num_1)
-		n2, _ := strconv.Atoi(compare_hit.Num_2)
-		n3, _ := strconv.Atoi(compare_hit.Num_3)
-		n4, _ := strconv.Atoi(compare_hit.Num_4)
-		n5, _ := strconv.Atoi(compare_hit.Num_5)
-		n6, _ := strconv.Atoi(compare_hit.Num_6)
-		n7, _ := strconv.Atoi(compare_hit.NumSpecial)
+		n1, _ := strconv.Atoi(next_hit.Num_1)
+		n2, _ := strconv.Atoi(next_hit.Num_2)
+		n3, _ := strconv.Atoi(next_hit.Num_3)
+		n4, _ := strconv.Atoi(next_hit.Num_4)
+		n5, _ := strconv.Atoi(next_hit.Num_5)
+		n6, _ := strconv.Atoi(next_hit.Num_6)
+		n7, _ := strconv.Atoi(next_hit.NumSpecial)
 		return map[int]struct{}{
 			n1: {},
 			n2: {},
@@ -270,7 +277,7 @@ func (plan *PlanFCountRank) ExportOnlyHitIndexes(datas []PlanFCountRankItem, com
 		results = append(results, PlanFCountRankOnlyHitIndex{
 			Num:         data.Num,
 			Index:       index + 1,
-			HitSerialID: compare_hit.SerialID,
+			HitSerialID: next_hit.SerialID,
 			Hit: func() bool {
 				if _, ok := hit_map[data.Num]; ok {
 					return true

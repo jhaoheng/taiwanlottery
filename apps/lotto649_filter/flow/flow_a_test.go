@@ -36,7 +36,7 @@ func Test_flowa_GetRankAndCSV(t *testing.T) {
 	csv := plan_a.Run().GetRankAndCSV()
 
 	//
-	filename := plan_a.GetNextHit().SerialID + "-1.csv"
+	filename := "flow_a_" + plan_a.GetNextHit().SerialID + "-1.csv"
 	os.WriteFile(filename, []byte(csv), 0777)
 
 	fmt.Println("輸出完畢,", filename)
@@ -65,6 +65,6 @@ func Test_flowa_GetRankAndExportOnlyHitIndexes(t *testing.T) {
 	_, csv := plan_a.GetRankAndExportOnlyHitIndexes()
 
 	// fmt.Println(csv)
-	filename := plan_a.GetNextHit().SerialID + "-2.csv"
+	filename := "flow_a_2" + plan_a.GetNextHit().SerialID + "-2.csv"
 	os.WriteFile(filename, []byte(csv), 0777)
 }

@@ -8,13 +8,12 @@ import (
 )
 
 /*
-- 從最後過濾的數字組中，取得所有個別數字
-- 從所有個別數字中，隨機給予 N 個號碼
-- 該號碼所有組合，必須要是過濾後的數字組之一
+- 確定移除的數字越準確，推估到的排列越正確
 */
 
-var arr = []int{4, 5, 6, 7, 8, 15, 17, 18, 19, 20, 21, 24, 25, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 43, 44, 45, 46, 48}
-var n_sets = 28 // 取得幾組數字
+var remove_arrs = []int{}    // 確定移除的數字
+var remove_special = []int{} // 根據情境, 要移除的特別數字
+var n_sets = 28              // 取得幾組數字
 
 func checkConsecutive(data []int) bool {
 	for i := 0; i < len(data)-2; i++ {
@@ -53,9 +52,16 @@ func combinations(arr []int) [][]int {
 }
 
 func main() {
-	datas := combinations(arr)
+	inferential_arrs := get_inference_arr()
+	fmt.Println("移除數字後, 預估的數字...")
+	fmt.Printf("%+v\n", inferential_arrs)
+	fmt.Println()
+	//
+	datas := combinations(inferential_arrs)
+	fmt.Println("總共可能出現組數", len(datas))
 
-	fmt.Println(len(datas))
+	//
+	fmt.Printf("隨機出現的 %v 組排列\n", n_sets)
 	rand_output(datas)
 }
 
@@ -77,4 +83,23 @@ func rand_output(datas [][]int) {
 	for _, v := range selectedNums {
 		fmt.Println(v)
 	}
+}
+
+func get_inference_arr() []int {
+	remove_map := map[int]struct{}{}
+	for _, v := range remove_arrs {
+		remove_map[v] = struct{}{}
+	}
+	for _, v := range remove_special {
+		remove_map[v] = struct{}{}
+	}
+
+	//
+	datas := []int{}
+	for i := 1; i <= 49; i++ {
+		if _, ok := remove_map[i]; !ok {
+			datas = append(datas, i)
+		}
+	}
+	return datas
 }
