@@ -14,7 +14,11 @@ import (
 */
 
 type IPlanG interface {
-	Get(table_name, sid string) (sums []model.NumIndexHitSum)
+	GetWithCount(table_name, sid string, is_data_include_sid bool, limit int) (sums []model.NumIndexHitSum)
+	Get(table_name, sid string, is_data_include_sid bool) (sums []model.NumIndexHitSum)
+	/*
+		index, num_idxes, sum(num_idx_出現次數總和), count(idx 的數量), hit(本期 or 下期樂透號碼的 idx)
+	*/
 	ExportCSV(sums []model.NumIndexHitSum) (csv string)
 }
 
@@ -27,8 +31,14 @@ func NewPlanG() IPlanG {
 	return &PlanG{}
 }
 
-// 取得指定 sid 的 hum_index_sum 資料
-func (plan *PlanG) Get(table_name, sid string) (sums []model.NumIndexHitSum) {
+// -
+func (plan *PlanG) Get(table_name, sid string, is_data_include_sid bool) (sums []model.NumIndexHitSum) {
+	plan.GetWithCount(table_name, sid, is_data_include_sid, 100)
+	return
+}
+
+// -
+func (plan *PlanG) GetWithCount(table_name, sid string, is_data_include_sid bool, limit int) (sums []model.NumIndexHitSum) {
 	plan.SID, _ = strconv.Atoi(sid)
 	if datas, err := model.NewNumIndexHit(table_name).SetSID(plan.SID).Take(); err != nil && err != gorm.ErrRecordNotFound {
 		panic(err)
@@ -37,7 +47,13 @@ func (plan *PlanG) Get(table_name, sid string) (sums []model.NumIndexHitSum) {
 	}
 	sums = []model.NumIndexHitSum{}
 	for i := 1; i <= 49; i++ {
-		sum, _ := model.NewNumIndexHit(table_name).Sum(plan.SID, i)
+		var sum = model.NumIndexHitSum{}
+		if is_data_include_sid {
+			sum, _ = model.NewNumIndexHit(table_name).SumInclude(plan.SID, i, limit)
+		} else {
+			sum, _ = model.NewNumIndexHit(table_name).SumNotInclude(plan.SID, i, limit)
+		}
+
 		sums = append(sums, sum)
 	}
 
@@ -68,8 +84,7 @@ func (plan *PlanG) ExportCSV(sums []model.NumIndexHitSum) (csv string) {
 				Count:   1,
 			}
 		} else {
-			indexes := count_map[sum.Total].Indexes
-			indexes = append(indexes, sum.Index)
+			indexes := append(count_map[sum.Total].Indexes, sum.Index)
 			count := count_map[sum.Total].Count + 1
 			count_map[sum.Total] = Result{
 				Indexes: indexes,
@@ -89,9 +104,10 @@ func (plan *PlanG) ExportCSV(sums []model.NumIndexHitSum) (csv string) {
 
 	//
 	BreakLineTag := "\r\n"
-	csv = "indexes,sum,count,hit" + BreakLineTag
-	for _, result := range results {
+	csv = ",indexes,sum,count,hit" + BreakLineTag
+	for index, result := range results {
 		// fmt.Printf("%+v\n", result)
+		csv = csv + fmt.Sprintf("%d", index) + ","
 		csv = csv + fmt.Sprintf("%v", result.Indexes) + ","
 		csv = csv + fmt.Sprintf("%d", result.Total) + ","
 		csv = csv + fmt.Sprintf("%d", result.Count) + ","

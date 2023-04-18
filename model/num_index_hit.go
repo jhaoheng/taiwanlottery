@@ -13,7 +13,8 @@ type INumIndexHit interface {
 	FinaAll() ([]NumIndexHit, error)
 	Create() (NumIndexHit, error)
 	// 取得 <=sid 的指定數字總和
-	Sum(sid, index int) (NumIndexHitSum, error)
+	SumInclude(sid, index int, limit int) (NumIndexHitSum, error)
+	SumNotInclude(end_sid, index int, limit int) (NumIndexHitSum, error)
 }
 
 type NumIndexHit struct {
@@ -225,15 +226,45 @@ type NumIndexHitSum struct {
 }
 
 // 取得 <=sid 的指定數字總和
-func (model *NumIndexHit) Sum(end_sid, index int) (NumIndexHitSum, error) {
-	result := NumIndexHitSum{
+func (model *NumIndexHit) SumInclude(end_sid, index int, limit int) (NumIndexHitSum, error) {
+	output := NumIndexHitSum{
 		Index: index,
 		Total: 0,
 	}
 	//
-	w := fmt.Sprintf("`sid` <= %d AND `num_idx_%d`=1", end_sid, index)
-	tx := model.db.Table(model.table_name).Select("sum(1) as total").Where(w).Find(&result)
-	return result, tx.Error
+	results := []int{}
+	item := fmt.Sprintf("num_idx_%d", index)
+	tx := model.db.Table(model.table_name).Select(item).Where("`sid` <= ?", end_sid).Order("sid DESC")
+	if limit != -1 {
+		tx = tx.Limit(limit)
+	}
+	tx = tx.Find(&results)
+	//
+	for _, result := range results {
+		output.Total = output.Total + result
+	}
+	return output, tx.Error
+}
+
+// 取得 <sid 的指定數字總和
+func (model *NumIndexHit) SumNotInclude(end_sid, index int, limit int) (NumIndexHitSum, error) {
+	output := NumIndexHitSum{
+		Index: index,
+		Total: 0,
+	}
+	//
+	results := []int{}
+	item := fmt.Sprintf("num_idx_%d", index)
+	tx := model.db.Table(model.table_name).Select(item).Where("`sid` < ?", end_sid).Order("sid DESC")
+	if limit != -1 {
+		tx = tx.Limit(limit)
+	}
+	tx = tx.Find(&results)
+	//
+	for _, result := range results {
+		output.Total = output.Total + result
+	}
+	return output, tx.Error
 }
 
 func (model *NumIndexHit) ExportNumsToMap() map[int]int {

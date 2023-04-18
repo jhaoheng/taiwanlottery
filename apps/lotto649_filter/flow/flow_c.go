@@ -1,6 +1,7 @@
 package flow
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -24,6 +25,8 @@ import (
 */
 
 type IFlowC interface {
+	GetFirstSID() int
+	GetLastSID() int
 	RunPlansAndGetReports() []*CSVData
 	// folderName, ex: 112000042
 	SaveReports(csvs []*CSVData, folderName string)
@@ -87,6 +90,16 @@ func NewFlowC(inferential_sid int, all_sets_map map[string]struct{}) IFlowC {
 	}
 }
 
+// -
+func (flow *FlowC) GetFirstSID() int {
+	return flow.FirstSID
+}
+
+// -
+func (flow *FlowC) GetLastSID() int {
+	return flow.LastSID
+}
+
 type CSVData struct {
 	Filename string
 	CSV      string
@@ -131,6 +144,17 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 	//
 	plan_f := plan.NewPlanFCountRank(all_sets_map)
 	ranks := plan_f.GetRank()
+	/*
+		- 將 ranks 寫入 table::rank
+		- 此為 all_sets_map 的排名, 跟 all_hits 相關, 所以紀錄標記為 flow.LastSID
+	*/
+	if _, err := model.NewRank().SetSID(flow.LastSID).SetData(func() []byte {
+		b, _ := json.Marshal(ranks)
+		return b
+	}()).Create(); err != nil {
+		panic(err)
+	}
+
 	csv_data_1 := flow.GetReport_1(plan_f, ranks, all_sets_map)
 	csv_data_2 := flow.GetReport_2(plan_f, ranks, all_sets_map)
 	csv_data_3 := flow.GetReport_3(plan_f, ranks, all_sets_map)
@@ -141,7 +165,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 	// 從 table::num_index_hit 中取得
 	plan_g_from_csv_data_2 := func() *CSVData {
 		plan_g := plan.NewPlanG()
-		sums := plan_g.Get("num_index_hit", strconv.Itoa(flow.LastSID))
+		sums := plan_g.Get("num_index_hit", strconv.Itoa(flow.LastSID), true)
 		csv := plan_g.ExportCSV(sums)
 
 		return &CSVData{
@@ -152,7 +176,7 @@ func (flow *FlowC) RunPlansAndGetReports() []*CSVData {
 	// 從 table::num_index_next_hit 中取得
 	plan_g_from_csv_data_3 := func() *CSVData {
 		plan_g := plan.NewPlanG()
-		sums := plan_g.Get("num_index_next_hit", strconv.Itoa(flow.InferentialSID))
+		sums := plan_g.Get("num_index_next_hit", strconv.Itoa(flow.InferentialSID), false)
 		csv := plan_g.ExportCSV(sums)
 
 		return &CSVData{

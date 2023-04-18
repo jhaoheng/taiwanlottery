@@ -3,13 +3,50 @@ package lotto649op
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 )
 
 func Test_CheckCustomizedHits_1(t *testing.T) {
+	texts := []string{
+		"04, 07, 08, 25, 34, 45",
+		"04, 08, 21, 24, 31, 39",
+		"04, 15, 25, 33, 39, 44",
+		"04, 17, 28, 30, 40, 46",
+		"04, 19, 33, 38, 45, 48",
+		"05, 20, 29, 30, 36, 37",
+		"06, 08, 34, 36, 41, 48",
+		"06, 15, 36, 38, 39, 41",
+		"06, 17, 37, 40, 43, 44",
+		"06, 20, 24, 31, 32, 39",
+		"07, 08, 15, 34, 39, 41",
+		"07, 17, 24, 29, 31, 48",
+		"07, 17, 29, 30, 34, 36",
+		"07, 18, 20, 37, 39, 40",
+		"07, 21, 36, 38, 40, 41",
+		"08, 15, 18, 19, 21, 48",
+		"08, 15, 28, 32, 37, 39",
+		"08, 28, 32, 38, 41, 46",
+		"15, 18, 19, 24, 37, 39",
+		"15, 19, 20, 32, 33, 48",
+		"17, 19, 21, 29, 31, 32",
+		"17, 21, 25, 28, 29, 38",
+		"17, 24, 28, 32, 39, 41",
+		"18, 21, 32, 34, 43, 46",
+		"20, 30, 36, 43, 44, 46",
+		"11, 25, 30, 31, 37, 45",
+		"25, 28, 32, 34, 40, 41",
+		"04, 11, 20, 25, 31, 33", // 新增
+		"11, 13, 21, 37, 41, 42", // 新增
+	}
 
 	datas := [][]string{}
+	for _, text := range texts {
+		items := strings.Split(text, ", ")
+		datas = append(datas, items)
+	}
+
 	// datas = append(datas, []string{"06", "07", "10", "16", "34", "41", "09"}) // 8 組, 這是我買的
 	// datas = append(datas, []string{"03", "13", "17", "18", "31", "49"}) // 8 組, 這是我買的
 	// datas = append(datas, []string{"02", "07", "09", "11", "33", "36"}) // 8 組
@@ -17,14 +54,13 @@ func Test_CheckCustomizedHits_1(t *testing.T) {
 	// // datas = append(datas, []string{"01", "03", "05", "08", "11", "13", "14", "20", "21", "30", "33", "36"})
 	// datas = append(datas, []string{"03", "13", "16", "19", "21", "23", "01"})
 	// datas = append(datas, []string{"09", "16", "22", "33", "41", "34"})
-	datas = append(datas, []string{"04", "11", "20", "25", "32", "39", "30"})
+	// datas = append(datas, []string{"04", "11", "20", "25", "32", "39", "30"})
 
 	for _, data := range datas {
 		result := NewLotto649OP(raw_results).CheckCustomizedHits(5, data...)
-
 		b, _ := json.MarshalIndent(result, "", "	")
 		fmt.Println(string(b))
-		fmt.Printf("歷史上，總共中獎有 => %v 組\n", len(result))
+		fmt.Printf("%v, 歷史上，總共中獎有 => %v 組\n", data, len(result))
 	}
 }
 

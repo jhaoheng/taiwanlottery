@@ -22,7 +22,7 @@ func (op *Lotto649OP) CheckCustomizedHits(hit_num_count int, nums ...string) (hi
 */
 func (op *Lotto649OP) CheckCustomizedHitsWithTime(start, end time.Time, hit_num_count int, nums ...string) (hit_lottery []Lotto649OPData) {
 	if len(nums) < 6 {
-		fmt.Println("選號數字過少, 最少要六個")
+		fmt.Println("選號數字過少, 最少要六個,", nums)
 		return
 	}
 	//

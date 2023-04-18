@@ -7,7 +7,7 @@ import (
 )
 
 func Test_CheckHitLotto(t *testing.T) {
-	results := NewLotto649OP(raw_results).CheckHitLotto(5)
+	results := NewLotto649OP(raw_results).CheckHitLotto(4)
 
 	//
 	for _, result := range results {

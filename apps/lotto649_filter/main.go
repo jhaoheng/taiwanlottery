@@ -22,7 +22,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	SpecificRun(112000042)
+	// SpecificRun(112000043)
+	MultiRun()
 }
 
 /*
@@ -51,7 +52,7 @@ func SpecificRun(inferential_sid int) {
 func MultiRun() {
 	_, all_sets_map := module.NewAllSets().Get()
 
-	for id := 1018; id < 1039; id++ {
+	for id := 2; id < 1039; id++ {
 		start := time.Now()
 		item, err := model.NewLottery().SetID(int64(id)).Take()
 		if err != nil {
@@ -59,9 +60,9 @@ func MultiRun() {
 		}
 		inferential_sid, _ := strconv.Atoi(item.SerialID)
 		flow_c := flow.NewFlowC(inferential_sid, all_sets_map)
-		// flow_c.RunPlansAndGetReports()
-		result := flow_c.RunPlansAndGetReports()
-		flow_c.SaveReports(result, "預測_"+strconv.Itoa(inferential_sid))
+		flow_c.RunPlansAndGetReports()
+		// result := flow_c.RunPlansAndGetReports()
+		// flow_c.SaveReports(result, ""+strconv.Itoa(flow_c.GetLastSID()))
 
 		fmt.Println(-time.Until(start))
 		fmt.Printf("\n\n\n\n\n")

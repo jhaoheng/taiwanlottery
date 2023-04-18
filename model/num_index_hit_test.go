@@ -39,7 +39,7 @@ func Test_NumIndexHit_Create(t *testing.T) {
 }
 
 func Test_NumIndexHit_Sum_1(t *testing.T) {
-	result, _ := NewNumIndexHit(table_name).Sum(112000040, 2)
+	result, _ := NewNumIndexHit(table_name).SumInclude(112000040, 2, 100)
 	fmt.Println(result)
 }
 
@@ -47,7 +47,7 @@ func Test_NumIndexHit_SumTreanding(t *testing.T) {
 
 	// sums := []NumIndexHitSum{}
 	for i := 1; i <= 49; i++ {
-		sum, _ := NewNumIndexHit(table_name).Sum(112000040, i)
+		sum, _ := NewNumIndexHit(table_name).SumInclude(112000040, i, -1)
 		fmt.Println(sum)
 	}
 }
