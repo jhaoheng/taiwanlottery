@@ -12,3 +12,4 @@ docker-entrypoint-initdb.d
 *.pdf
 *.numbers
 預測*
+apps/*
